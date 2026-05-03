@@ -1,0 +1,11 @@
+category_name,serial_num,device_tag,brand_name,model_name,device_condition,site_name,badge_id,return_at,comments
+Laptop,SN-2024-0001,TAG-001,Dell,Latitude 5420,good,Lincoln Elementary School,,,
+Laptop,SN-2024-0002,TAG-002,HP,EliteBook 840,new,Lincoln Elementary School,,,Assigned to new teacher
+Laptop,SN-2024-0003,TAG-003,Apple,MacBook Air,good,Washington Middle School,,6/15/26,End of year return
+Tablet,SN-2024-0004,TAG-004,Apple,iPad 9th Gen,good,Lincoln Elementary School,12345,,
+Tablet,SN-2024-0005,TAG-005,Samsung,Galaxy Tab S7,damaged_keyboard,Washington Middle School,,,Keyboard replacement needed
+Chromebook,SN-2024-0006,TAG-006,Acer,Chromebook 314,new,Roosevelt High School,67890,,
+Chromebook,SN-2024-0007,TAG-007,Lenovo,Chromebook 100e,broken_screen,Washington Middle School,,,Screen cracked
+Laptop,SN-2024-0008,TAG-008,Dell,Latitude 3410,not_charging,Lincoln Elementary School,,,Charger port issue
+Tablet,SN-2024-0009,TAG-009,Apple,iPad Air,good,Washington Middle School,11111,,
+Chromebook,SN-2024-0010,TAG-010,HP,Chromebook 11,water_damaged,District Office,,,Spill incident

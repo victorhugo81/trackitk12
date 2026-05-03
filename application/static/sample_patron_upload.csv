@@ -1,0 +1,4 @@
+badge_id,first_name,middle_name,last_name,email,grade,status,rm_num,role_name,site_name,guardian_name,phone
+STU-001,Alex,,Smith,a.smith@school.edu,9,Active,204,Student,Lincoln Elementary,Jane Smith,555-867-5309
+STU-002,Maria,Elena,Garcia,m.garcia@school.edu,KN,Active,101,Student,Lincoln Elementary,,
+STU-003,Jordan,,Lee,j.lee@school.edu,12,Active,215,Student,Lincoln Elementary,Pat Lee,555-123-4567

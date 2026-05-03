@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<div class="row">
+    <div class="col-12">
+        <div class="main-card-box card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-main shadow-dark border-radius-lg pt-4 pb-3">
+                    
+                    <h2 class="text-white text-capitalize ps-3">Patron Details</h2>
+                </div>
+            </div>
+            <div class="card-body px-4 pb-4">
+
+                <!-- Action buttons -->
+                <div class="d-flex justify-content-end gap-2 mb-3 no-print">
+                    <button id="exportPdfBtn" class="btn add-table-button shadow-dark mb-4 no-print">
+                        <i class="material-symbols-rounded" style="font-size: 16px;">picture_as_pdf</i> Export PDF
+                    </button>
+                    <a href="{{ url_for('routes.patrons') }}" class="btn reset-button-box shadow-dark">Back</a>
+                </div>
+
+                <!-- Section: Patron Info -->
+                <div class="row g-3">
+                    <div class="col-12 col-sm-6 col-lg-4">
+                <p class="text-uppercase text-sm text-muted fw-bold mb-2 mt-3">Patron Information</p>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                <p class="text-uppercase text-sm text-muted fw-bold mb-2 mt-3">Contact Information</p>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                <p class="text-uppercase text-sm text-muted fw-bold mb-2 mt-3">Account & Placement</p>
+                    </div>
+                </div>
+
+
+                <hr class="mt-0 mb-3">
+                <div class="row g-3">
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="text-break"><strong>Patron ID:</strong> {{ patron.badge_id }}</div>
+                        <div class="text-break"><strong>First Name:</strong> {{ patron.first_name }}</div>
+                        <div class="text-break"><strong>Middle Name:</strong> {{ patron.middle_name or 'N/A' }}</div>
+                        <div class="text-break"><strong>Last Name:</strong> {{ patron.last_name }}</div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="text-break"><strong>Guardian Name:</strong> {{ patron.guardian_name or 'N/A' }}</div>
+                        <div class="text-break"><strong>Phone:</strong> {{ patron.phone or 'N/A' }}</div>
+                        <div class="text-break"><strong>Email:</strong> {{ patron.email or 'N/A' }}</div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="text-break"><strong>Role:</strong> {{ patron.role.role_name or 'N/A' }}</div>
+                        <div class="text-break"><strong>Status:</strong> {{ patron.status or 'N/A' }}</div>
+                        <div class="text-break"><strong>Site:</strong> {{ patron.site.site_name or 'N/A' }}</div>
+                        <div class="text-break"><strong>Grade:</strong> {{ patron.grade }}</div>
+                        <div class="text-break"><strong>Room:</strong> {{ patron.rm_num or 'N/A' }}</div>
+                    </div>
+                </div>
+
+
+                <!-- Section: Assigned Devices -->
+                <div class="d-flex align-items-center justify-content-between pt-3">
+                    <p class="text-uppercase text-sm text-muted fw-bold mb-2">Assigned Devices</p>
+                    <button type="button" class="btn add-table-button shadow-dark mb-4 no-print" data-bs-toggle="modal" data-bs-target="#assignDeviceModal">
+                        <i class="material-symbols-rounded position-relative text-lg">add</i> Assign Device
+                    </button>
+                </div>
+                <hr class="mt-0 mb-3">
+                <div class="table-responsive">
+                    <table class="table align-items-center mb-0 table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Site</th>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Tag</th>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Serial</th>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Brand</th>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Model</th>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Condition</th>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Check Out</th>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Return Date</th>
+                                <th class="text-uppercase text-xxs font-weight-bolder text-end no-print">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set unreturned = patron.devices | selectattr('return_at', 'none') | list %}
+                            {% set returned = patron.devices | rejectattr('return_at', 'none') | sort(attribute='return_at') | list %}
+                            {% for device in unreturned + returned %}
+                                <tr class="table-highlight-row {{ 'row-checked-out' if device.assigned_to_id and not device.return_at else 'row-checked-in' }}">
+                                <td class="text-xs text-secondary align-middle text-center">{{ device.site.site_acronyms if device.site else 'N/A' }}</td>
+                                <td class="text-xs text-secondary align-middle text-center">{{ device.device_tag or 'N/A' }}</td>
+                                <td class="text-xs text-secondary align-middle text-center">{{ device.serial_num }}</td>
+                                <td class="text-xs text-secondary align-middle text-center text-capitalize">{{ device.brand_name }}</td>
+                                <td class="text-xs text-secondary align-middle text-center text-capitalize">{{ device.model_name }}</td>
+                                <td class="text-xs text-secondary align-middle text-center text-capitalize">{{ device.device_condition }}</td>
+                                <td class="text-xs text-secondary align-middle text-center">{{ device.chkout_at.strftime('%m/%d/%Y') if device.chkout_at else 'N/A' }}</td>
+                                <td class="text-xs text-secondary align-middle text-center">{{ device.return_at.strftime('%m/%d/%Y') if device.return_at else 'N/A' }}</td>
+                                <td class="text-end no-print">
+                                    <div class="d-flex justify-content-end gap-2">
+
+                                        {% if not device.return_at %}
+                                        <form action="{{ url_for('routes.return_device', device_id=device.id) }}" method="POST" onsubmit="return confirm('Mark this device as returned?');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn table-button-edit font-weight-bold" title="Mark as returned">
+                                                <i class="material-symbols-rounded position-relative text-lg">assignment_return</i>
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                        <a href="{{ url_for('routes.edit_device', device_id=device.id) }}" type="button" class="btn table-button-edit font-weight-bold">
+                                            <i class="material-symbols-rounded position-relative text-lg">edit</i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center text-sm text-muted py-3">No devices assigned.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Export timestamp (hidden until PDF export) -->
+                <div id="exportTimestamp" style="display:none;" class="mt-4 pt-2 border-top text-muted" style="font-size:11px;">
+                    <small>Exported on: <span id="exportDateText"></span></small>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Device Modal -->
+<div class="modal fade" id="assignDeviceModal" tabindex="-1" aria-labelledby="assignDeviceModalLabel" aria-hidden="true"
+     data-patron-id="{{ patron.id }}" data-csrf="{{ csrf_token() }}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignDeviceModalLabel">Assign Device</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="deviceSearchInput" class="form-control mb-3" placeholder="Search by tag or serial number...">
+                <div class="table-responsive">
+                    <table class="table align-items-center mb-0 table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Tag</th>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Serial</th>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Brand</th>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Model</th>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Condition</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="deviceSearchResults">
+                            <tr>
+                                <td colspan="6" class="text-center text-sm text-muted py-3">Type to search available devices.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const modal = document.getElementById('assignDeviceModal');
+    const input = document.getElementById('deviceSearchInput');
+    const tbody = document.getElementById('deviceSearchResults');
+    const patronId = modal.dataset.patronId;
+    const csrfToken = modal.dataset.csrf;
+    let debounceTimer;
+
+    function renderRows(devices) {
+        if (!devices.length) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-sm text-muted py-3">No available devices found.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = devices.map(d => `
+            <tr class="table-highlight-row">
+                <td class="text-xs text-secondary align-middle text-center">${d.device_tag}</td>
+                <td class="text-xs text-secondary align-middle text-center">${d.serial_num}</td>
+                <td class="text-xs text-secondary align-middle text-center text-capitalize">${d.brand_name}</td>
+                <td class="text-xs text-secondary align-middle text-center text-capitalize">${d.model_name}</td>
+                <td class="text-xs text-secondary align-middle text-center text-capitalize">${d.device_condition}</td>
+                <td class="text-end">
+                    <form action="/assign_device/${patronId}" method="POST">
+                        <input type="hidden" name="csrf_token" value="${csrfToken}">
+                        <input type="hidden" name="device_id" value="${d.id}">
+                        <button type="submit" class="btn table-button-edit font-weight-bold">
+                            <i class="material-symbols-rounded position-relative text-lg">link</i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function search(q) {
+        fetch(`/search_available_devices?q=${encodeURIComponent(q)}`)
+            .then(r => r.json())
+            .then(renderRows);
+    }
+
+    input.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => search(this.value), 300);
+    });
+
+    document.getElementById('assignDeviceModal').addEventListener('shown.bs.modal', function () {
+        input.value = '';
+        search('');
+        input.focus();
+    });
+})();
+</script>
+
+<script>
+document.getElementById('exportPdfBtn').addEventListener('click', function () {
+    const btn = this;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="material-symbols-rounded position-relative text-lg">hourglass_empty</i> Generating...';
+
+    // Build timestamp
+    const now = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const dateStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+    const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    const displayTs = `${dateStr} ${timeStr}`;
+    const fileTs = `${dateStr}_${pad(now.getHours())}${pad(now.getMinutes())}`;
+
+    // Show timestamp footer
+    const tsEl = document.getElementById('exportTimestamp');
+    document.getElementById('exportDateText').textContent = displayTs;
+    tsEl.style.setProperty('display', 'block', 'important');
+
+    // Hide buttons and action columns
+    const noPrintEls = document.querySelectorAll('.no-print');
+    noPrintEls.forEach(el => el.style.setProperty('display', 'none', 'important'));
+
+    const target = document.querySelector('.main-card-box');
+
+    // Apply grayscale + clean up card styling for export
+    const originalFilter = target.style.filter;
+    const originalBoxShadow = target.style.boxShadow;
+    const originalBorder = target.style.border;
+    target.style.filter = 'grayscale(100%)';
+    target.style.boxShadow = 'none';
+    target.style.border = '1px solid #ccc';
+
+    html2canvas(target, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(function (canvas) {
+        const { jsPDF } = window.jspdf;
+        const margin = 10;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pageW = pdf.internal.pageSize.getWidth();
+        const pageH = pdf.internal.pageSize.getHeight();
+        const printW = pageW - margin * 2;
+        const printH = (canvas.height * printW) / canvas.width;
+        let yPos = 0;
+        let remaining = printH;
+
+        while (remaining > 0) {
+            pdf.addImage(canvas, 'PNG', margin, margin - yPos, printW, printH);
+            remaining -= (pageH - margin * 2);
+            yPos += (pageH - margin * 2);
+            if (remaining > 0) pdf.addPage();
+        }
+
+        pdf.save(`{{ patron.first_name }}_{{ patron.last_name }}_{{ patron.badge_id }}_${fileTs}.pdf`);
+
+        // Restore
+        target.style.filter = originalFilter;
+        target.style.boxShadow = originalBoxShadow;
+        target.style.border = originalBorder;
+        tsEl.style.removeProperty('display');
+        noPrintEls.forEach(el => el.style.removeProperty('display'));
+        btn.disabled = false;
+        btn.innerHTML = '<i class="material-symbols-rounded position-relative text-lg">picture_as_pdf</i> Export PDF';
+    });
+});
+</script>
+
+{% endblock %}

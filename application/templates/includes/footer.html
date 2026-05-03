@@ -1,0 +1,174 @@
+
+<!-- footer -->
+<footer class="footer py-4">
+  <div class="container-fluid">
+    <div class="row justify-content-end">
+      <div class="col-12 text-end">
+        <div class="copyright text-sm text-muted">
+          <a href="" class="font-weight-bold" target="_blank">AssistITk12</a>
+          © <script>
+            document.write(new Date().getFullYear());
+          </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- End footer -->
+</div>
+</main>
+
+
+
+<!--   close warning messages  -->
+<script>
+  setTimeout(() => {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => alert.classList.remove('show'));
+  }, 5000); // Dismiss after 5 seconds
+</script>
+
+
+<!-- Delete confirmation modal -->
+<script>
+(function () {
+  var modal = document.getElementById('deleteModal');
+  if (!modal) return;
+  modal.addEventListener('show.bs.modal', function (e) {
+    var btn = e.relatedTarget;
+    var name = btn.getAttribute('data-record-name') || '';
+    var url  = btn.getAttribute('data-action-url')  || '';
+    document.getElementById('deleteModalMessage').textContent =
+      'Delete \u201c' + name + '\u201d? This cannot be undone.';
+    document.getElementById('deleteModalForm').setAttribute('action', url);
+  });
+})();
+</script>
+
+<!-- Mobile menu toggle -->
+<script>
+(function () {
+  const toggle = document.querySelector('.mobile-menu-toggle');
+  const wrapper = document.getElementById('menuToggle');
+  if (!toggle || !wrapper) return;
+
+  function openMenu() {
+    wrapper.classList.add('is-open');
+    toggle.setAttribute('aria-expanded', 'true');
+    toggle.setAttribute('aria-label', 'Close navigation menu');
+  }
+
+  function closeMenu() {
+    wrapper.classList.remove('is-open');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Open navigation menu');
+  }
+
+  toggle.addEventListener('click', function () {
+    wrapper.classList.contains('is-open') ? closeMenu() : openMenu();
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && wrapper.classList.contains('is-open')) {
+      closeMenu();
+      toggle.focus();
+    }
+  });
+
+  // Close when a nav link is clicked
+  document.querySelectorAll('#menu a').forEach(function (link) {
+    link.addEventListener('click', closeMenu);
+  });
+})();
+</script>
+
+<!-- Required field indicators -->
+<script>
+(function () {
+  var main = document.getElementById('content');
+  if (!main) return;
+
+  // Append * to every label whose associated control carries [required]
+  main.querySelectorAll('input[required], select[required], textarea[required]').forEach(function (field) {
+    // Primary: label[for=id]
+    var label = field.id ? main.querySelector('label[for="' + field.id + '"]') : null;
+    // Fallback: first label that is a sibling inside the nearest wrapper div
+    if (!label) {
+      var wrap = field.closest('.input-group, .form-floating, .mb-3, .col, div');
+      if (wrap) label = wrap.querySelector('label');
+    }
+    if (!label || label.querySelector('.req-star')) return;
+    var star = document.createElement('span');
+    star.className = 'req-star text-danger ms-1';
+    star.setAttribute('aria-hidden', 'true');
+    star.textContent = '*';
+    label.appendChild(star);
+  });
+
+  // Add a "* Required field" legend once per form that contains required controls
+  main.querySelectorAll('form').forEach(function (form) {
+    if (!form.querySelector('[required]') || form.querySelector('.required-note')) return;
+    var note = document.createElement('p');
+    note.className = 'required-note';
+    // Insert after any leading hidden inputs (e.g. CSRF token)
+    var anchor = null;
+    for (var i = 0; i < form.children.length; i++) {
+      var el = form.children[i];
+      if (!(el.tagName === 'INPUT' && el.type === 'hidden')) { anchor = el; break; }
+    }
+    anchor ? form.insertBefore(note, anchor) : form.appendChild(note);
+  });
+})();
+</script>
+
+<!-- Unsaved changes guard — watches all POST forms inside main content -->
+<script>
+(function () {
+  var dirty = false;
+  var main = document.getElementById('content');
+  if (!main) return;
+
+  main.querySelectorAll('form[method="post"], form[method="POST"]').forEach(function (form) {
+    form.addEventListener('change', function () { dirty = true; });
+    // Clear flag on submit so the navigation after POST doesn't trigger the warning
+    form.addEventListener('submit', function () { dirty = false; });
+  });
+
+  window.addEventListener('beforeunload', function (e) {
+    if (dirty) {
+      e.preventDefault();
+      e.returnValue = ''; // Required for Chrome
+    }
+  });
+
+  // Allow other scripts to clear the dirty flag before a programmatic form.submit()
+  window.clearUnsavedGuard = function () { dirty = false; };
+})();
+</script>
+
+<!--   Core JS Files   -->
+<script src="{{ url_for('static', filename='js/core/popper.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/core/bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/plugins/perfect-scrollbar.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/plugins/smooth-scrollbar.min.js') }}"></script>
+
+<script>
+var win = navigator.platform.indexOf('Win') > -1;
+if (win && document.querySelector('#sidenav-scrollbar')) {
+var options = {
+  damping: '0.5'
+}
+Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+}
+</script>
+<!-- Github buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+<!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+<script src="{{ url_for('static', filename='js/material-dashboard.js') }}"></script>
+</body>
+
+</html>
+

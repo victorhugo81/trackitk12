@@ -1,0 +1,8 @@
+badge_id,first_name,middle_name,last_name,email,grade,status,rm_num,role_name,site_name,guardian_name,phone
+10001,Emma,,Johnson,ejohnson@students.edu,5,Active,101,Student,Lincoln Elementary School,Mary Johnson,555-0101
+10002,Liam,A,Smith,lsmith@students.edu,7,Active,205,Student,Washington Middle School,John Smith,555-0102
+10003,Olivia,,Garcia,ogarcia@students.edu,KN,Active,102,Student,Roosevelt High School,Carlos Garcia,555-0103
+10004,Noah,,Williams,nwilliams@students.edu,9,Active,312,Student,Washington Middle School,Susan Williams,555-0104
+10005,Ava,M,Brown,abrown@students.edu,3,Active,103,Student,Jefferson Elementary School,Tom Brown,555-0105
+10006,James,,Davis,jdavis@students.edu,8,Inactive,206,Teacher,District Office,Patricia Davis,555-0106
+10007,Maya,America,Solis,maya@mail.com,3,Active,4,Teacher,Jefferson Elementary School,,

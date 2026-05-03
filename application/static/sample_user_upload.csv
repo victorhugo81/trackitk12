@@ -1,0 +1,3 @@
+first_name,middle_name,last_name,email,role_id,site_name,rm_num,status
+Jane,,Doe,j.doe@school.edu,2,Lincoln Elementary,101,Active
+John,A,Smith,j.smith@school.edu,2,Lincoln Elementary,102,Active

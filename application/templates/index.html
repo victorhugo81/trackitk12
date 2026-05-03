@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row">
+  <div class="col-12">
+    <div class="main-card-box card my-4">
+      <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+        <div class="bg-gradient-main custom-title-card">
+          <h2 class="text-white text-capitalize ps-3"><i class="material-symbols-rounded opacity-5">dashboard</i> {{ current_page_name }}</h2>
+        </div>
+      </div>
+
+      <div class="card-body px-4">
+        <br>
+    <!-- pause main content card -->
+
+
+        <!-- Filters -->
+        <form method="get" id="filter-form" >
+          <div class="row g-3">
+            <div class="col-12 col-sm-6 col-lg-3">
+              <label for="site_filter" class="filter-labels text-sm mb-0 text-capitalize">Filter By Site</label>
+              <select name="site_filter" id="site_filter" class="form-select-box form-select" onchange="document.getElementById('filter-form').submit()">
+                <option value="">All Sites</option>
+                {% for site in sites %}
+                <option value="{{ site.id }}" {% if site_filter == site.id|string %}selected{% endif %}>{{ site.site_name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+              <label for="grade_filter" class="filter-labels text-sm mb-0 text-capitalize">Filter By Grade</label>
+              <select name="grade_filter" id="grade_filter" class="form-select-box form-select" onchange="document.getElementById('filter-form').submit()">
+                <option value="">All Grades</option>
+                {% for grade in grades %}
+                <option value="{{ grade }}" {% if grade_filter == grade %}selected{% endif %}>{{ grade }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+              <label for="role_filter" class="filter-labels text-sm mb-0 text-capitalize">Filter By Role</label>
+              <select name="role_filter" id="role_filter" class="form-select-box form-select" onchange="document.getElementById('filter-form').submit()">
+                <option value="">All Roles</option>
+                {% for role in roles %}
+                <option value="{{ role.id }}" {% if role_filter == role.id|string %}selected{% endif %}>{{ role.role_name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+              <label for="category_filter" class="filter-labels text-sm mb-0 text-capitalize">Filter By Category</label>
+              <select name="category_filter" id="category_filter" class="form-select-box form-select" onchange="document.getElementById('filter-form').submit()">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if category_filter == cat.id|string %}selected{% endif %}>{{ cat.category_name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </form>
+        <!-- End Filters -->
+
+        <!-- Stat Cards -->
+        <div class="row g-3 mt-1 mb-4">
+
+
+      <!-- Total Devices Card -->
+      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <a href="{{ url_for('routes.devices') }}">
+          <div class="small-cards-dashboard card">
+              <div class="card-header p-2 ps-3">
+                  <div class="d-flex justify-content-between">
+                      <div>
+                          <p class="text-sm mb-0 text-uppercase text-dark">Total Devices</p>
+                          <h4 class="mb-0">{{ total_devices }}</h4>
+                      </div>
+                      <div class="icon icon-md icon-shape bg-gradient-main shadow-dark shadow text-center border-radius-lg">
+                          <i class="material-symbols-rounded opacity-10">devices</i>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </a>
+      </div>
+
+
+
+      <!-- checked out Card -->
+      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <a href="{{ url_for('routes.devices', availability_filter='checked_out') }}">
+          <div class="small-cards-dashboard card">
+              <div class="card-header p-2 ps-3">
+                  <div class="d-flex justify-content-between">
+                      <div>
+                          <p class="text-sm mb-0 text-uppercase text-dark">Checked Out</p>
+                          <h4 class="mb-0">{{ checked_out }}</h4>
+                      </div>
+                      <div class="icon icon-md icon-shape bg-gradient-main shadow-dark shadow text-center border-radius-lg">
+                          <i class="material-symbols-rounded opacity-10">assignment_ind</i>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </a>
+      </div>
+
+
+
+
+      <!-- Available Card -->
+      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <a href="{{ url_for('routes.devices', availability_filter='available') }}">
+          <div class="small-cards-dashboard card">
+              <div class="card-header p-2 ps-3">
+                  <div class="d-flex justify-content-between">
+                      <div>
+                          <p class="text-sm mb-0 text-uppercase text-dark">Available</p>
+                          <h4 class="mb-0">{{ available }}</h4>
+                      </div>
+                      <div class="icon icon-md icon-shape bg-gradient-main shadow-dark shadow text-center border-radius-lg">
+                          <i class="material-symbols-rounded opacity-10">check_circle</i>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </a>
+      </div>
+
+
+      <!-- In Repair Card -->
+      <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+        <a href="{{ url_for('routes.devices', availability_filter='in_repair') }}">
+          <div class="small-cards-dashboard card">
+              <div class="card-header p-2 ps-3">
+                  <div class="d-flex justify-content-between">
+                      <div>
+                          <p class="text-sm mb-0 text-uppercase text-dark">In Repair</p>
+                          <h4 class="mb-0">{{ in_repair }}</h4>
+                      </div>
+                      <div class="icon icon-md icon-shape bg-gradient-main shadow-dark shadow text-center border-radius-lg">
+                          <i class="material-symbols-rounded opacity-10">build</i>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </a>
+      </div>
+
+
+
+        </div>
+        <!-- End Stat Cards -->
+
+        <div class="row g-4">
+
+          <!-- Device Categories -->
+          <div class="col-12 col-lg-4">
+          <div class="tall-card card">
+            <div class="card-dashboard-box">
+            <p class="text-uppercase text-sm text-muted fw-bold mb-2">Device Categories</p>
+            <hr class="mt-0 mb-3">
+            {% if category_stats %}
+            <div class="table-responsive">
+              <table class="table align-items-center mb-0 table-striped" id="categoryList">
+                <thead>
+                  <tr>
+                    <th class="text-uppercase text-xxs font-weight-bolder align-middle">Category</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for cat_id, category_name, count in category_stats %}
+                  <tr class="table-highlight-row category-item" style="cursor:pointer;" data-href="{{ url_for('routes.devices') }}?category_filter={{ cat_id }}" onclick="location.href=this.dataset.href">
+                    <td class="text-xs align-middle text-capitalize fw-bold">{{ category_name }}</td>
+                    <td class="text-xs align-middle text-center">
+                      <span class="badge rounded-pill text-white bg-gradient-main">{{ count }}</span>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-2" id="categoryPagination" style="display:none;">
+              <span class="text-xs text-muted" id="categoryPageInfo"></span>
+              <div class="d-flex gap-1">
+                <button class="btn btn-sm btn-outline-secondary py-1 px-2" id="categoryPrevBtn" onclick="categoryChangePage(-1)">&#8249;</button>
+                <button class="btn btn-sm btn-outline-secondary py-1 px-2" id="categoryNextBtn" onclick="categoryChangePage(1)">&#8250;</button>
+              </div>
+            </div>
+            <script>
+            (function() {
+              var perPage = 5;
+              var currentPage = 1;
+              var items = Array.from(document.querySelectorAll('#categoryList tbody .category-item'));
+              var totalPages = Math.ceil(items.length / perPage);
+
+              function render() {
+                items.forEach(function(item, i) {
+                  item.style.display = (i >= (currentPage - 1) * perPage && i < currentPage * perPage) ? '' : 'none';
+                });
+                document.getElementById('categoryPageInfo').textContent = 'Page ' + currentPage + ' of ' + totalPages;
+                document.getElementById('categoryPrevBtn').disabled = currentPage === 1;
+                document.getElementById('categoryNextBtn').disabled = currentPage === totalPages;
+              }
+
+              window.categoryChangePage = function(dir) {
+                currentPage = Math.min(Math.max(1, currentPage + dir), totalPages);
+                render();
+              };
+
+              if (items.length > 0) {
+                document.getElementById('categoryPagination').style.display = 'flex';
+                render();
+              }
+            })();
+            </script>
+            {% else %}
+            <p class="text-sm text-muted">No device categories found.</p>
+            {% endif %}
+            </div>
+            </div>
+          </div>
+
+          <!-- Devices In Repair -->
+          <div class="col-12 col-lg-8">
+          <div class="tall-card card">
+            <div class="card-dashboard-box">
+            <p class="text-uppercase text-sm text-muted fw-bold mb-2">
+              Devices In Repair
+              {% if site_filter or grade_filter or role_filter or category_filter %}
+              <span class="text-xs fw-normal text-muted">(filtered)</span>
+              {% endif %}
+            </p>
+            <hr class="mt-0 mb-3">
+            <div class="table-responsive">
+              <table class="table align-items-center mb-0 table-striped" id="repairTable">
+                <thead>
+                  <tr>
+                    <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Site</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Serial</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Brand / Model</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Assigned To</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Repair Days</th>
+                  </tr>
+                </thead>
+                <tbody id="repairTableBody">
+                  {% for device in repair_devices %}
+                  <tr class="table-highlight-row repair-row" style="cursor:pointer;" data-href="{{ url_for('routes.edit_device', device_id=device.id) }}" onclick="location.href=this.dataset.href">
+                    <td class="text-xs align-middle text-center text-uppercase">{{ device.site.site_acronyms or 'N/A' }}</td>
+                    <td class="text-xs align-middle text-center">{{ device.serial_num }}</td>
+                    <td class="text-xs align-middle text-center text-capitalize">{{ device.brand_name }} {{ device.model_name }}</td>
+                    <td class="text-xs align-middle text-center text-capitalize">{{ device.assigned_to.get_patron_name() if device.assigned_to else 'N/A' }}</td>
+                    <td class="text-xs align-middle text-center">{{ (today - device.repair_date.date()).days if device.repair_date else 'N/A' }}</td>
+                  </tr>
+                  {% else %}
+                  <tr>
+                    <td colspan="5" class="text-center text-sm text-muted py-3">No devices currently in repair.</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-2" id="repairPagination" style="display:none;">
+              <span class="text-xs text-muted" id="repairPageInfo"></span>
+              <div class="d-flex gap-1">
+                <button class="btn btn-sm btn-outline-secondary py-1 px-2" id="repairPrevBtn" onclick="repairChangePage(-1)">&#8249;</button>
+                <button class="btn btn-sm btn-outline-secondary py-1 px-2" id="repairNextBtn" onclick="repairChangePage(1)">&#8250;</button>
+              </div>
+            </div>
+            <script>
+            (function() {
+              var perPage = 5;
+              var currentPage = 1;
+              var rows = Array.from(document.querySelectorAll('#repairTableBody .repair-row'));
+              var totalPages = Math.ceil(rows.length / perPage);
+
+              function render() {
+                rows.forEach(function(row, i) {
+                  row.style.display = (i >= (currentPage - 1) * perPage && i < currentPage * perPage) ? '' : 'none';
+                });
+                document.getElementById('repairPageInfo').textContent = 'Page ' + currentPage + ' of ' + totalPages;
+                document.getElementById('repairPrevBtn').disabled = currentPage === 1;
+                document.getElementById('repairNextBtn').disabled = currentPage === totalPages;
+              }
+
+              window.repairChangePage = function(dir) {
+                currentPage = Math.min(Math.max(1, currentPage + dir), totalPages);
+                render();
+              };
+
+              if (rows.length > 0) {
+                document.getElementById('repairPagination').style.display = 'flex';
+                render();
+              }
+            })();
+            </script>
+            </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- End Row -->
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

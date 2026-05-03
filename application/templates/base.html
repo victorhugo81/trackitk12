@@ -1,0 +1,93 @@
+<!--
+=========================================================
+* assistITk12 - v1.0  
+=========================================================
+
+* Product Page: 
+* Licensed under MIT GNU v3.0
+
+=========================================================
+-->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ current_page_name }}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+  <!-- Material Icons -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <!-- CSS Files -->
+  <link id="pagestyle" href="{{ url_for('static', filename='css/bootstrap.css') }}" rel="stylesheet" />
+  <link id="pagestyle" href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" />
+</head>
+<body class="g-sidenav-show  bg-gray-100">
+    <a href="#content" class="visually-hidden-focusable">Skip to main content</a>
+
+ <!-- Navigation bar -->
+    {% include './includes/nav.html' %}
+    
+
+ <!-- notifications + flash messages -->
+<div id="alert-container" class="alert-container-box" aria-live="polite" aria-atomic="false">
+
+    {% for notification in active_notifications %}
+    <div class="warning-message-box border-radius-lg alert alert-info alert-dismissible text-white fade show mb-2" role="status">
+        <span>{{ notification.msg_content }}</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="warning-message-box border-radius-lg alert alert-{{ 'danger' if category == 'danger' else 'success' if category == 'success' else 'info' if category == 'info' else 'warning' }} alert-dismissible text-white fade show mb-2"
+             role="{{ 'alert' if category in ('danger', 'warning') else 'status' }}">
+            <span>{{ message }}</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+</div>
+ <!-- end notifications + flash messages -->
+
+
+
+  
+
+<!-- Shared delete confirmation modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog"
+     aria-labelledby="deleteModalLabel" aria-modal="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body pt-2">
+        <p id="deleteModalMessage" class="mb-0"></p>
+      </div>
+      <div class="modal-footer border-0 pt-2">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <form id="deleteModalForm" method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+   <!-- main content -->
+    <main id="content">
+        {% block content %}
+        {% endblock %}
+    </main>
+   <!-- end main content -->
+
+
+   <!-- footer -->
+    {% include './includes/footer.html' %}

@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- main content card -->
+<div class="row">
+    <div class="col-12">
+        <div class="main-card-box card my-4">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+          <div class="bg-gradient-main shadow-dark border-radius-lg pt-4 pb-3 d-flex align-items-center justify-content-between px-3">
+            <h2 class="text-white text-capitalize mb-0">Bulk Upload Patrons</h2>
+            <a href="{{ url_for('routes.patrons') }}" class="btn btn-sm btn-outline-light mb-0">
+                <i class="material-symbols-rounded position-relative" style="font-size:1rem; vertical-align:middle;">arrow_back</i> Back
+            </a>
+          </div>
+        </div>
+        <div class="card-body px-0 pb-2">
+            <br>
+
+    <!-- Instructions -->
+    <div class="card-body align-items-center">
+        <div class="container-md">
+            <h3 class="mb-3">
+                <i class="material-symbols-rounded position-relative me-1" style="font-size:1.2rem; vertical-align:middle;">info</i>
+                Instructions
+            </h3>
+            <ol class="text-sm ps-3">
+                <li class="mb-1">Download the sample CSV template using the button below.</li>
+                <li class="mb-1">Fill in all required columns. Do not remove or rename column headers.</li>
+                <li class="mb-1">If a patron with the same <code>badge_id</code> already exists, they will be <strong>updated</strong>. Otherwise a new patron will be <strong>created</strong>.</li>
+                <li class="mb-1"><code>role_name</code> and <code>site_name</code> must match existing records exactly (case-insensitive).</li>
+                <li>Save your file as <strong>patrons.csv</strong> (UTF-8 encoding) before uploading.</li>
+            </ol>
+
+    <!-- patrons.csv column reference -->
+    <div class="row mt-3">
+        <div class="col">
+            <h3 class="mb-3">
+                <i class="material-symbols-rounded position-relative me-1" style="font-size:1.2rem; vertical-align:middle;">table_chart</i>
+                patrons.csv
+            </h3>
+        </div>
+        <div class="col justify-content-end d-flex">
+            <a href="{{ url_for('static', filename='sample_patron_upload.csv') }}"
+               class="btn btn-outline-dark" download>
+                <i class="material-symbols-rounded position-relative me-1"
+                   style="font-size:1rem; vertical-align:middle;">download</i>
+                Sample Template
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive mb-4">
+        <table class="table table-bordered table-sm text-sm align-middle mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th class="text-uppercase text-xxs font-weight-bolder ps-3">Column</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder">Required</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder">Description</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder">Example</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="ps-3 font-weight-bold">badge_id</td>
+                    <td><span class="badge badge-sm bg-gradient-danger">Required</span></td>
+                    <td>Unique patron ID — existing badge IDs will be updated</td>
+                    <td class="text-muted">STU-001</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">first_name</td>
+                    <td><span class="badge badge-sm bg-gradient-danger">Required</span></td>
+                    <td>Patron's first name</td>
+                    <td class="text-muted">Alex</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">last_name</td>
+                    <td><span class="badge badge-sm bg-gradient-danger">Required</span></td>
+                    <td>Patron's last name</td>
+                    <td class="text-muted">Smith</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">email</td>
+                    <td><span class="badge badge-sm bg-gradient-danger">Required</span></td>
+                    <td>Unique email address</td>
+                    <td class="text-muted">a.smith@school.edu</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">grade</td>
+                    <td><span class="badge badge-sm bg-gradient-danger">Required</span></td>
+                    <td>Grade level</td>
+                    <td class="text-muted">KN, 1 – 12</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">status</td>
+                    <td><span class="badge badge-sm bg-gradient-danger">Required</span></td>
+                    <td>Account status</td>
+                    <td class="text-muted">Active</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">rm_num</td>
+                    <td><span class="badge badge-sm bg-gradient-danger">Required</span></td>
+                    <td>Room number</td>
+                    <td class="text-muted">204</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">role_name</td>
+                    <td><span class="badge badge-sm bg-gradient-danger">Required</span></td>
+                    <td>Exact role name as it appears in the system (case-insensitive)</td>
+                    <td class="text-muted">Student</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">site_name</td>
+                    <td><span class="badge badge-sm bg-gradient-danger">Required</span></td>
+                    <td>Exact site name as it appears in the system (case-insensitive)</td>
+                    <td class="text-muted">Lincoln Elementary</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">middle_name</td>
+                    <td><span class="badge badge-sm bg-gradient-secondary">Optional</span></td>
+                    <td>Patron's middle name</td>
+                    <td class="text-muted">Lee</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">guardian_name</td>
+                    <td><span class="badge badge-sm bg-gradient-secondary">Optional</span></td>
+                    <td>Guardian's full name</td>
+                    <td class="text-muted">Jane Smith</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">phone</td>
+                    <td><span class="badge badge-sm bg-gradient-secondary">Optional</span></td>
+                    <td>Contact phone number</td>
+                    <td class="text-muted">555-867-5309</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+        </div>
+    </div>
+    <hr class="mx-4">
+    <!-- End Instructions -->
+
+    <!-- Upload Form -->
+    <div class="card-body">
+        <div class="container-md">
+
+            <form action="{{ url_for('routes.bulk_upload_patrons') }}" method="POST" enctype="multipart/form-data" id="patronUploadForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <!-- Drag and Drop Zone -->
+                <div id="patronDropZone" class="drop-file-upload">
+                    <i class="material-symbols-rounded" style="font-size: 3rem; color: #344767;">upload_file</i>
+                    <p class="fw-bold mt-2 mb-1" style="font-size: 1.05rem;">Click or drag and drop your CSV file here</p>
+                    <p class="text-muted text-sm mb-0">Accepts <strong>patrons.csv</strong> &mdash; maximum 10 MB</p>
+                    <input type="file" id="patronCsvFile" name="csvFile" accept=".csv" class="d-none">
+                    <div id="patronFileName" class="text-sm mt-3"></div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-3">
+                    <button type="submit" class="btn bg-gradient-dark" id="patronUploadBtn" disabled>Upload</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+    <!-- End Upload Form -->
+
+    {% if processed %}
+    <hr class="mx-4">
+
+    <!-- Results -->
+    <div class="table-per-page-section mt-2">
+        <div class="row justify-content-between align-items-center">
+            <div class="col">
+                <h5 class="mb-0 ps-2">
+                    <i class="material-symbols-rounded position-relative me-1" style="font-size:1.2rem; vertical-align:middle;">task_alt</i>
+                    Upload Results
+                </h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="container-md">
+
+        {% if added > 0 or updated > 0 %}
+        <div class="alert alert-success text-sm" role="alert">
+            <i class="material-symbols-rounded position-relative me-1" style="font-size:1rem; vertical-align:middle;">check_circle</i>
+            {{ added }} patron(s) added &nbsp;&bull;&nbsp; {{ updated }} patron(s) updated.
+        </div>
+        {% endif %}
+
+        {% if errors %}
+        <div class="alert alert-warning text-sm" role="alert">
+            <i class="material-symbols-rounded position-relative me-1" style="font-size:1rem; vertical-align:middle;">warning</i>
+            {{ errors|length }} row(s) could not be processed. Review the table below and correct your CSV file.
+        </div>
+        <div class="table-responsive">
+            <table class="table align-items-center mb-0 table-striped">
+                <thead>
+                    <tr>
+                        <th class="text-uppercase text-xxs font-weight-bolder">Row #</th>
+                        <th class="text-uppercase text-xxs font-weight-bolder">Badge ID</th>
+                        <th class="text-uppercase text-xxs font-weight-bolder">Reason(s)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for err in errors %}
+                    <tr>
+                        <td class="text-xs text-secondary align-middle">{{ err.row }}</td>
+                        <td class="text-xs text-secondary align-middle">{{ err.badge_id }}</td>
+                        <td class="text-xs text-secondary align-middle">
+                            {% for reason in err.reasons %}
+                            <div>{{ reason }}</div>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if added == 0 and updated == 0 and not errors %}
+        <div class="alert alert-info text-sm" role="alert">
+            No rows were processed. Make sure your CSV file has data rows.
+        </div>
+        {% endif %}
+
+        </div>
+    </div>
+    <!-- End Results -->
+    {% endif %}
+
+</div>
+</div>
+</div>
+</div>
+<!-- End main content card -->
+
+<script>
+(function () {
+    const dz  = document.getElementById('patronDropZone');
+    const fi  = document.getElementById('patronCsvFile');
+    const fn  = document.getElementById('patronFileName');
+    const btn = document.getElementById('patronUploadBtn');
+
+    dz.addEventListener('click', () => fi.click());
+    dz.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dz.style.backgroundColor = '#e9ecef';
+        dz.style.borderColor = '#5e72e4';
+    });
+    dz.addEventListener('dragleave', () => {
+        dz.style.backgroundColor = '#f8f9fa';
+        dz.style.borderColor = '#344767';
+    });
+    dz.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dz.style.backgroundColor = '#f8f9fa';
+        dz.style.borderColor = '#344767';
+        if (e.dataTransfer.files.length > 0) {
+            fi.files = e.dataTransfer.files;
+            handleFile(fi.files);
+        }
+    });
+    fi.addEventListener('change', () => { if (fi.files.length > 0) handleFile(fi.files); });
+
+    function handleFile(files) {
+        if (!files[0].name.toLowerCase().endsWith('.csv')) {
+            fn.innerHTML = '<span class="text-danger"><i class="material-symbols-rounded position-relative" style="font-size:0.9rem;vertical-align:middle;">error</i> File must be a .csv</span>';
+            btn.disabled = true;
+            return;
+        }
+        fn.innerHTML = `<span class="text-success"><i class="material-symbols-rounded position-relative" style="font-size:0.9rem;vertical-align:middle;">groups</i> ${files[0].name}</span>`;
+        btn.disabled = false;
+    }
+})();
+</script>
+
+{% endblock %}

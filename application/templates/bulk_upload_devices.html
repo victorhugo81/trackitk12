@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- main content card -->
+<div class="row">
+    <div class="col-12">
+        <div class="main-card-box card my-4">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+          <div class="bg-gradient-main shadow-dark border-radius-lg pt-4 pb-3 d-flex align-items-center justify-content-between px-3">
+            <h2 class="text-white text-capitalize mb-0">Bulk Upload Devices</h2>
+            <a href="{{ url_for('routes.devices') }}" class="btn btn-sm btn-outline-light mb-0">
+                <i class="material-symbols-rounded position-relative" style="font-size:1rem; vertical-align:middle;">arrow_back</i> Back
+            </a>
+          </div>
+        </div>
+        <div class="card-body px-0 pb-2">
+            <br>
+
+    <!-- Instructions -->
+    <div class="card-body align-items-center">
+        <div class="container-md">
+            <h3 class="mb-3">
+                <i class="material-symbols-rounded position-relative me-1" style="font-size:1.2rem; vertical-align:middle;">info</i>
+                Instructions
+            </h3>
+            <ol class="text-sm ps-3">
+                <li class="mb-1">Download the sample CSV template using the button below.</li>
+                <li class="mb-1">Fill in all required columns. Do not remove or rename column headers.</li>
+                <li class="mb-1">If a device with the same <code>serial_num</code> already exists, it will be <strong>updated</strong>. Otherwise a new device will be <strong>created</strong>.</li>
+                <li class="mb-1"><code>site_name</code> and <code>category_name</code> must match existing records exactly (case-insensitive).</li>
+                <li>Save your file as <strong>devices.csv</strong> (UTF-8 encoding) before uploading.</li>
+            </ol>
+
+    <!-- devices.csv column reference -->
+    <div class="row mt-3">
+        <div class="col">
+            <h3 class="mb-3">
+                <i class="material-symbols-rounded position-relative me-1" style="font-size:1.2rem; vertical-align:middle;">table_chart</i>
+                devices.csv
+            </h3>
+        </div>
+        <div class="col justify-content-end d-flex">
+            <a href="{{ url_for('static', filename='downloads/sample_device_upload.csv') }}"
+               class="btn btn-outline-dark" download>
+                <i class="material-symbols-rounded position-relative me-1"
+                   style="font-size:1rem; vertical-align:middle;">download</i>
+                Sample Template
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive mb-4">
+        <table class="table table-bordered table-sm text-sm align-middle mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th class="text-uppercase text-xxs font-weight-bolder ps-3">Column</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder">Required</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder">Description</th>
+                    <th class="text-uppercase text-xxs font-weight-bolder">Example</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="ps-3 font-weight-bold">category_name</td>
+                    <td><span class="badge badge-sm bg-gradient-danger">Required</span></td>
+                    <td>Must match an existing category</td>
+                    <td class="text-muted">Chromebook</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">serial_num</td>
+                    <td><span class="badge badge-sm bg-gradient-danger">Required</span></td>
+                    <td>Unique identifier — existing serials will be updated</td>
+                    <td class="text-muted">SN-2024-0001</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">brand_name</td>
+                    <td><span class="badge badge-sm bg-gradient-danger">Required</span></td>
+                    <td>Device manufacturer</td>
+                    <td class="text-muted">Dell</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">model_name</td>
+                    <td><span class="badge badge-sm bg-gradient-danger">Required</span></td>
+                    <td>Device model</td>
+                    <td class="text-muted">Latitude 5420</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">device_condition</td>
+                    <td><span class="badge badge-sm bg-gradient-danger">Required</span></td>
+                    <td>One of: <code>New</code>, <code>Used</code>, <code>Broken Screen</code>, <code>Damaged Keyboard</code>, <br>
+                        <code>Not Charging</code>, <code>Water Damaged</code>, <code>Not Turning On</code>, <code>Other</code></td>
+                    <td class="text-muted">Used</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">site_name</td>
+                    <td><span class="badge badge-sm bg-gradient-danger">Required</span></td>
+                    <td>Must match an existing site (case-insensitive)</td>
+                    <td class="text-muted">Lincoln Elementary</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">device_tag</td>
+                    <td><span class="badge badge-sm bg-gradient-secondary">Optional</span></td>
+                    <td>Asset tag or label</td>
+                    <td class="text-muted">TAG-001</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">badge_id</td>
+                    <td><span class="badge badge-sm bg-gradient-secondary">Optional</span></td>
+                    <td>Patron badge ID to assign the device to</td>
+                    <td class="text-muted">12345</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">return_at</td>
+                    <td><span class="badge badge-sm bg-gradient-secondary">Optional</span></td>
+                    <td>Expected return date</td>
+                    <td class="text-muted">2026-06-15</td>
+                </tr>
+                <tr>
+                    <td class="ps-3 font-weight-bold">comments</td>
+                    <td><span class="badge badge-sm bg-gradient-secondary">Optional</span></td>
+                    <td>Any notes about the device</td>
+                    <td class="text-muted">Screen cracked</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+        </div>
+    </div>
+    <hr class="mx-4">
+    <!-- End Instructions -->
+
+    <!-- Upload Form -->
+    <div class="card-body">
+        <div class="container-md">
+
+            <form action="{{ url_for('routes.bulk_upload_devices') }}" method="POST" enctype="multipart/form-data" id="deviceUploadForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <!-- Drag and Drop Zone -->
+                <div id="deviceDropZone" class="drop-file-upload">
+                    <i class="material-symbols-rounded" style="font-size: 3rem; color: #344767;">upload_file</i>
+                    <p class="fw-bold mt-2 mb-1" style="font-size: 1.05rem;">Click or drag and drop your CSV file here</p>
+                    <p class="text-muted text-sm mb-0">Accepts <strong>devices.csv</strong> &mdash; maximum 10 MB</p>
+                    <input type="file" id="deviceCsvFile" name="csvFile" accept=".csv" class="d-none">
+                    <div id="deviceFileName" class="text-sm mt-3"></div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-3">
+                    <button type="submit" class="btn bg-gradient-dark" id="deviceUploadBtn" disabled>Upload</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+    <!-- End Upload Form -->
+
+    {% if processed %}
+    <hr class="mx-4">
+
+    <!-- Results -->
+    <div class="table-per-page-section mt-2">
+        <div class="row justify-content-between align-items-center">
+            <div class="col">
+                <h5 class="mb-0 ps-2">
+                    <i class="material-symbols-rounded position-relative me-1" style="font-size:1.2rem; vertical-align:middle;">task_alt</i>
+                    Upload Results
+                </h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="container-md">
+
+        {% if devices_added > 0 or devices_updated > 0 %}
+        <div class="alert alert-success text-sm" role="alert">
+            <i class="material-symbols-rounded position-relative me-1" style="font-size:1rem; vertical-align:middle;">check_circle</i>
+            {{ devices_added }} device(s) added &nbsp;&bull;&nbsp; {{ devices_updated }} device(s) updated.
+        </div>
+        {% endif %}
+
+        {% if errors %}
+        <div class="alert alert-warning text-sm" role="alert">
+            <i class="material-symbols-rounded position-relative me-1" style="font-size:1rem; vertical-align:middle;">warning</i>
+            {{ errors|length }} row(s) could not be processed. Review the table below and correct your CSV file.
+        </div>
+        <div class="table-responsive">
+            <table class="table align-items-center mb-0 table-striped">
+                <thead>
+                    <tr>
+                        <th class="text-uppercase text-xxs font-weight-bolder">Row #</th>
+                        <th class="text-uppercase text-xxs font-weight-bolder">Serial #</th>
+                        <th class="text-uppercase text-xxs font-weight-bolder">Reason(s)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for err in errors %}
+                    <tr>
+                        <td class="text-xs text-secondary align-middle">{{ err.row }}</td>
+                        <td class="text-xs text-secondary align-middle">{{ err.serial }}</td>
+                        <td class="text-xs text-secondary align-middle">
+                            {% for reason in err.reasons %}
+                            <div>{{ reason }}</div>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if devices_added == 0 and devices_updated == 0 and not errors %}
+        <div class="alert alert-info text-sm" role="alert">
+            No rows were processed. Make sure your CSV file has data rows.
+        </div>
+        {% endif %}
+
+        </div>
+    </div>
+    <!-- End Results -->
+    {% endif %}
+
+</div>
+</div>
+</div>
+</div>
+<!-- End main content card -->
+
+<script>
+(function () {
+    const dz  = document.getElementById('deviceDropZone');
+    const fi  = document.getElementById('deviceCsvFile');
+    const fn  = document.getElementById('deviceFileName');
+    const btn = document.getElementById('deviceUploadBtn');
+
+    dz.addEventListener('click', () => fi.click());
+    dz.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dz.style.backgroundColor = '#e9ecef';
+        dz.style.borderColor = '#5e72e4';
+    });
+    dz.addEventListener('dragleave', () => {
+        dz.style.backgroundColor = '#f8f9fa';
+        dz.style.borderColor = '#344767';
+    });
+    dz.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dz.style.backgroundColor = '#f8f9fa';
+        dz.style.borderColor = '#344767';
+        if (e.dataTransfer.files.length > 0) {
+            fi.files = e.dataTransfer.files;
+            handleFile(fi.files);
+        }
+    });
+    fi.addEventListener('change', () => { if (fi.files.length > 0) handleFile(fi.files); });
+
+    function handleFile(files) {
+        if (!files[0].name.toLowerCase().endsWith('.csv')) {
+            fn.innerHTML = '<span class="text-danger"><i class="material-symbols-rounded position-relative" style="font-size:0.9rem;vertical-align:middle;">error</i> File must be a .csv</span>';
+            btn.disabled = true;
+            return;
+        }
+        fn.innerHTML = `<span class="text-success"><i class="material-symbols-rounded position-relative" style="font-size:0.9rem;vertical-align:middle;">devices</i> ${files[0].name}</span>`;
+        btn.disabled = false;
+    }
+})();
+</script>
+
+{% endblock %}

@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="main-card-box card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+
+                <div class="bg-gradient-main shadow-dark border-radius-lg pt-4 pb-3">
+                    <h1 class="text-white text-capitalize ps-3">Edit Device</h1>
+                </div>
+
+            </div>
+            <div class="card-body px-3 pb-4">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+
+<div class="col-12 d-flex justify-content-between align-items-center sticky-top bg-white py-2 mb-4 border-bottom">
+
+    <div class="form-check d-flex align-items-center gap-2">
+        {{ form.in_repair(class="form-check-input") }}
+        {{ form.in_repair.label(class="form-check-label fw-bold mb-0") }}
+    </div>
+
+    <div class="d-flex gap-2">
+        {{ form.submit(class_="btn bg-gradient-main") }}
+
+        {% if device.assigned_to %}
+        <a class="btn reset-button-box shadow-dark back-btn"
+           href="{{ url_for('routes.patron_details', patron_id=device.assigned_to.id) }}">
+           Back
+        </a>
+        {% else %}
+        <a class="btn reset-button-box shadow-dark back-btn" href="/devices">
+           Back
+        </a>
+        {% endif %}
+    </div>
+
+</div>
+
+                    <!-- Section: Device Info -->
+                    <p class="text-uppercase text-sm text-muted fw-bold mb-2 mt-3">Device Information</p>
+                    <hr class="mt-0 mb-3">
+                    <div class="row g-3">
+                        <div class="col-12 col-sm-6 col-lg-4">
+                            {{ form.category_id.label(class="form-label") }}
+                            {{ form.category_id(class="form-select") }}
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-4">
+                            {{ form.brand_name.label(class="form-label ") }}
+                            {{ form.brand_name(class="form-control text-capitalize") }}
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-4">
+                            {{ form.model_name.label(class="form-label") }}
+                            {{ form.model_name(class="form-control text-capitalize") }}
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-4">
+                            {{ form.serial_num.label(class="form-label") }}
+                            {{ form.serial_num(class="form-control") }}
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-4">
+                            {{ form.device_tag.label(class="form-label") }}
+                            {{ form.device_tag(class="form-control") }}
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-4">
+                            {{ form.device_condition.label(class="form-label") }}
+                            {{ form.device_condition(class="form-select text-capitalize") }}
+                        </div>
+                    </div>
+
+                    <!-- Section: Assignment -->
+                    <p class="text-uppercase text-sm text-muted fw-bold mb-2 mt-8 my-5">Assignment</p>
+                    <hr class="mt-0 mb-3">
+                    <div class="row g-3">
+                        <div class="col-12 col-sm-6">
+                            {{ form.site_id.label(class="form-label") }}
+                            {{ form.site_id(class="form-select") }}
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            {{ form.assigned_to_id.label(class="form-label") }}
+                            <input type="hidden" name="assigned_to_id" id="assigned_to_id"
+                                   value="{{ device.assigned_to_id or 0 }}">
+                            <div class="d-flex gap-2 align-items-center">
+                                <input type="text" id="assigned_to_display" class="read-only form-control text-capitalize" readonly
+                                       value="{{ device.assigned_to.get_patron_name() if device.assigned_to else 'Unassigned' }}">
+                                <button type="button" class="btn bg-gradient-main shadow-dark" data-bs-toggle="modal" data-bs-target="#assignPatronModal" title="Search patron">
+                                    <i class="material-symbols-rounded text-lg">person_search</i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            {{ form.return_at.label(class="form-label") }}
+                            {{ form.return_at(class="form-control", type="date", value=device.return_at.strftime('%Y-%m-%d') if device.return_at else '') }}
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            {{ form.chkout_at.label(class="form-label") }}
+                            {{ form.chkout_at(class="form-control", type="date", value=device.chkout_at.strftime('%Y-%m-%d') if device.chkout_at else '') }}
+                        </div>
+                    </div>
+                </form>
+
+
+                
+                <!-- Section: Repair Comments -->
+                <p class="text-uppercase text-sm text-muted fw-bold mb-2 mt-8 my-5">Repair Comments</p>
+                <hr class="mt-0 mb-3">
+
+<div class="row g-4">
+    <div class="col-lg-11 mx-auto">
+        <div class="p-3 position-relative">
+            <form method="POST" action="{{ url_for('routes.add_device_comment', device_id=device.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="input-group mb-3">
+                    <input name="content" class="form-control" placeholder="Add a repair comment...">
+                    <button type="submit" class="btn bg-gradient-main">
+                        Post<br>Comment
+                    </button>
+                </div>
+            </form>
+
+            <div class="border rounded-3 p-3 position-relative">
+            <button class="scroll-btn scroll-up btn btn-sm btn-light">▲</button>
+            <div id="commentsBox" style="max-height:300px; padding:15px 25px; overflow-y:auto;">
+                {% for c in device.repair_comments %}
+                <div class="border-start border-3 ps-3 mb-3">
+                    <hr class="mb-2 pt-2">
+                    <div class="text-xs text-muted mb-1">
+                        <strong>{{ c.author.get_full_name() }}</strong> —
+                        <span class="local-time" data-utc="{{ c.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}"></span>
+                    </div>
+                    <div class="text-sm ps-3">{{ c.content }}</div>
+                </div>
+                {% else %}
+                <p class="text-sm text-muted">No repair comments yet.</p>
+                {% endfor %}
+            </div>
+            <button class="scroll-btn scroll-down btn btn-sm btn-light">▼</button>
+            </div>  
+        </div>
+
+    </div>
+</div>
+
+
+
+<script>
+    document.querySelectorAll('.local-time').forEach(el => {
+        const d = new Date(el.dataset.utc);
+        el.textContent = d.toLocaleString('en-US', {
+            month: '2-digit', day: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+    });
+
+
+
+
+
+    const box = document.getElementById("commentsBox");
+
+document.querySelector(".scroll-up").onclick = () => {
+    box.scrollBy({ top: -100, behavior: "smooth" });
+};
+
+document.querySelector(".scroll-down").onclick = () => {
+    box.scrollBy({ top: 100, behavior: "smooth" });
+};
+</script>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section: Change History -->
+<p class="text-uppercase text-sm text-muted fw-bold mb-2 mt-5">Change History</p>
+<hr class="mt-0 mb-3">
+<div class="row g-4">
+    <div class="col-lg-11 mx-auto">
+        <div class="border rounded-3 p-3 position-relative">
+            <button class="scroll-btn scroll-up-hist btn btn-sm btn-light">▲</button>
+            <div id="historyBox" style="max-height:300px; padding:15px 25px; overflow-y:auto;">
+                {% for h in device.history %}
+                <div class="border-start border-3 ps-3 mb-3 {% if h.action == 'created' %}border-success{% else %}border-primary{% endif %}">
+                    <hr class="mb-2 pt-2">
+                    <div class="text-xs text-muted mb-1">
+                        {% if h.action == 'created' %}
+                        <span class="badge bg-gradient-success me-1">Created</span>
+                        {% else %}
+                        <span class="badge bg-gradient-primary me-1">{{ h.field_name }}</span>
+                        {% endif %}
+                        {% if h.changed_by %}<strong>{{ h.changed_by.get_full_name() }}</strong> — {% endif %}
+                        <span class="local-time" data-utc="{{ h.changed_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}"></span>
+                    </div>
+                    {% if h.action == 'updated' %}
+                    <div class="text-sm ps-3">
+                        <span class="text-danger text-decoration-line-through me-2">{{ h.old_value or '—' }}</span>
+                        <i class="material-symbols-rounded text-sm align-middle" style="font-size:0.9rem;">arrow_forward</i>
+                        <span class="text-success ms-2">{{ h.new_value or '—' }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% else %}
+                <p class="text-sm text-muted">No history yet.</p>
+                {% endfor %}
+            </div>
+            <button class="scroll-btn scroll-down-hist btn btn-sm btn-light">▼</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const hbox = document.getElementById('historyBox');
+    document.querySelector('.scroll-up-hist').onclick   = () => hbox.scrollBy({ top: -100, behavior: 'smooth' });
+    document.querySelector('.scroll-down-hist').onclick = () => hbox.scrollBy({ top: 100,  behavior: 'smooth' });
+})();
+</script>
+
+
+<!-- Assign Patron Modal -->
+<div class="modal fade" id="assignPatronModal" tabindex="-1" aria-labelledby="assignPatronModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignPatronModalLabel">Select Patron</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="patronSearchInput" class="form-control mb-3" placeholder="Search by name or patron ID...">
+                <div class="table-responsive">
+                    <table class="table align-items-center mb-0 table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Patron ID</th>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Name</th>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Grade</th>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Site</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="patronSearchResults">
+                            <tr>
+                                <td colspan="5" class="text-center text-sm text-muted py-3">Type to search patrons.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const input = document.getElementById('patronSearchInput');
+    const tbody = document.getElementById('patronSearchResults');
+    const assignedHidden = document.getElementById('assigned_to_id');
+    const assignedDisplay = document.getElementById('assigned_to_display');
+    let debounceTimer;
+
+    function renderRows(patrons) {
+        if (!patrons.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-sm text-muted py-3">No patrons found.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = patrons.map(p => `
+            <tr class="table-highlight-row">
+                <td class="text-xs text-secondary align-middle text-center">${p.badge_id}</td>
+                <td class="text-xs text-secondary align-middle text-center text-capitalize">${p.name}</td>
+                <td class="text-xs text-secondary align-middle text-center">${p.grade}</td>
+                <td class="text-xs text-secondary align-middle text-center">${p.site}</td>
+                <td class="text-end">
+                    <button type="button" class="btn table-button-edit font-weight-bold select-patron-btn"
+                            data-id="${p.id}" data-name="${p.name}">
+                        <i class="material-symbols-rounded position-relative text-lg">person_add</i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+
+        tbody.querySelectorAll('.select-patron-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                assignedHidden.value = this.dataset.id;
+                assignedDisplay.value = this.dataset.name;
+                bootstrap.Modal.getInstance(document.getElementById('assignPatronModal')).hide();
+            });
+        });
+    }
+
+    function search(q) {
+        fetch(`/search_patrons?q=${encodeURIComponent(q)}`)
+            .then(r => r.json())
+            .then(renderRows);
+    }
+
+    input.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => search(this.value), 300);
+    });
+
+    document.getElementById('assignPatronModal').addEventListener('shown.bs.modal', function () {
+        input.value = '';
+        search('');
+        input.focus();
+    });
+})();
+</script>
+
+{% endblock %}

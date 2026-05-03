@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="main-card-box card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-main shadow-dark border-radius-lg pt-4 pb-3">
+                    <h2 class="text-white text-capitalize ps-3">Add New Device</h2>
+                </div>
+            </div>
+            <div class="card-body px-3 pb-4">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+
+                    <!-- Section: Device Info -->
+                    <p class="text-uppercase text-sm text-muted fw-bold mb-2 mt-3">Device Information</p>
+                    <hr class="mt-0 mb-3">
+                    <div class="row g-3">
+                        <div class="col-12 col-sm-6 col-lg-4">
+                            {{ form.category_id.label(class="form-label") }}
+                            {{ form.category_id(class="form-select") }}
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-4">
+                            {{ form.brand_name.label(class="form-label") }}
+                            {{ form.brand_name(class="form-control") }}
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-4">
+                            {{ form.model_name.label(class="form-label") }}
+                            {{ form.model_name(class="form-control") }}
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-4">
+                            {{ form.serial_num.label(class="form-label") }}
+                            {{ form.serial_num(class="form-control") }}
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-4">
+                            {{ form.device_tag.label(class="form-label") }}
+                            {{ form.device_tag(class="form-control") }}
+                        </div>
+                        <div class="col-12 col-sm-6 col-lg-4">
+                            {{ form.device_condition.label(class="form-label") }}
+                            {{ form.device_condition(class="form-select") }}
+                        </div>
+                    </div>
+
+                    <!-- Section: Assignment -->
+                    <p class="text-uppercase text-sm text-muted fw-bold mb-2 mt-4">Assignment</p>
+                    <hr class="mt-0 mb-3">
+                    <div class="row g-3">
+                        <div class="col-12 col-sm-6">
+                            {{ form.site_id.label(class="form-label") }}
+                            {{ form.site_id(class="form-select") }}
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            {{ form.assigned_to_id.label(class="form-label") }}
+                            <input type="hidden" name="assigned_to_id" id="assigned_to_id" value="0">
+                            <div class="d-flex gap-2 align-items-center">
+                                <input type="text" id="assigned_to_display" class="form-control"
+                                       readonly placeholder="Unassigned — click to search">
+                                <button type="button" class="btn bg-gradient-main shadow-dark"
+                                        data-bs-toggle="modal" data-bs-target="#assignPatronModal"
+                                        aria-label="Search for a patron to assign"
+                                        title="Search patron">
+                                    <i class="material-symbols-rounded text-lg" aria-hidden="true">person_search</i>
+                                </button>
+                                <button type="button" id="clearPatronBtn" class="btn btn-outline-secondary"
+                                        aria-label="Clear patron assignment"
+                                        title="Clear assignment" style="display:none;">
+                                    <i class="material-symbols-rounded text-lg" aria-hidden="true">person_remove</i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section: Notes -->
+                    <p class="text-uppercase text-sm text-muted fw-bold mb-2 mt-4">Notes</p>
+                    <hr class="mt-0 mb-3">
+                    <div class="row g-3">
+                        <div class="col-12 col-lg-6">
+                            {{ form.comments.label(class="form-label") }}
+                            {{ form.comments(class="form-control", rows="6") }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        {{ form.submit(class_="btn bg-gradient-main") }}
+                        <a type="button" class="btn reset-button-box shadow-dark" href="/devices">Back</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assign Patron Modal -->
+<div class="modal fade" id="assignPatronModal" tabindex="-1" aria-labelledby="assignPatronModalLabel" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignPatronModalLabel">Select Patron</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="patronSearchInput" class="form-control mb-3"
+                       placeholder="Search by name or patron ID...">
+                <div class="table-responsive">
+                    <table class="table align-items-center mb-0 table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Patron ID</th>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Name</th>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Grade</th>
+                                <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Site</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="patronSearchResults">
+                            <tr><td colspan="5" class="text-center text-sm text-muted py-3">Type to search patrons.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const input       = document.getElementById('patronSearchInput');
+    const tbody       = document.getElementById('patronSearchResults');
+    const hidden      = document.getElementById('assigned_to_id');
+    const display     = document.getElementById('assigned_to_display');
+    const clearBtn    = document.getElementById('clearPatronBtn');
+    let debounceTimer;
+
+    function renderRows(patrons) {
+        if (!patrons.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-sm text-muted py-3">No patrons found.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = patrons.map(p => `
+            <tr class="table-highlight-row">
+                <td class="text-xs text-secondary align-middle text-center">${p.badge_id}</td>
+                <td class="text-xs text-secondary align-middle text-center text-capitalize">${p.name}</td>
+                <td class="text-xs text-secondary align-middle text-center">${p.grade}</td>
+                <td class="text-xs text-secondary align-middle text-center">${p.site}</td>
+                <td class="text-end">
+                    <button type="button" class="btn table-button-edit font-weight-bold select-patron-btn"
+                            data-id="${p.id}" data-name="${p.name}"
+                            aria-label="Assign ${p.name}">
+                        <i class="material-symbols-rounded position-relative text-lg" aria-hidden="true">person_add</i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+
+        tbody.querySelectorAll('.select-patron-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                hidden.value  = this.dataset.id;
+                display.value = this.dataset.name;
+                clearBtn.style.display = '';
+                bootstrap.Modal.getInstance(document.getElementById('assignPatronModal')).hide();
+            });
+        });
+    }
+
+    function search(q) {
+        fetch(`/search_patrons?q=${encodeURIComponent(q)}`)
+            .then(r => r.json())
+            .then(renderRows);
+    }
+
+    input.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => search(this.value), 300);
+    });
+
+    document.getElementById('assignPatronModal').addEventListener('shown.bs.modal', function () {
+        input.value = '';
+        search('');
+        input.focus();
+    });
+
+    clearBtn.addEventListener('click', function () {
+        hidden.value  = '0';
+        display.value = '';
+        display.placeholder = 'Unassigned — click to search';
+        clearBtn.style.display = 'none';
+    });
+})();
+</script>
+
+{% endblock %}

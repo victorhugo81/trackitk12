@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+    <!-- main content card -->
+<div class="row">
+    <div class="col-12">
+        <div class="main-card-box card my-4">
+        <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+        <div class="bg-gradient-main custom-title-card">
+          <h2 class="text-white text-capitalize ps-3"><i class="material-symbols-rounded opacity-5">face_6</i> {{ current_page_name }}</h2>
+          </div>
+      <div class="card-body px-4 pb-4">
+            <br>
+    <!-- pause main content card -->
+
+
+    <!-- search box card -->
+          <div class="search-content-box mb-4">
+            <div class="row justify-content-between">
+                <div class="col">
+                    <form method="get" class="d-flex">
+                        <input type="text" name="search" class="search-field-box form-control" placeholder="Search by name"
+                               value="{{ request.args.get('search', '') }}">
+                        <button type="submit" class="btn bg-gradient-main search-button-box shadow-dark">Search</button>
+                        <a href="{{ url_for('routes.patrons') }}" type="button" class="btn reset-button-box shadow-dark">Reset</a>
+                    </form>
+                </div>
+            </div>
+
+            <form method="get" id="filter-form">
+                <input type="hidden" name="search" value="{{ request.args.get('search', '') }}">
+                <div class="row g-3">
+                    <div class="col-12 col-sm-6 col-lg-4">
+                  <label for="site_filter" class="filter-labels text-sm mb-0 text-capitalize">Filter By Site</label>
+                        <select name="site_filter" id="site_filter" class="form-select-box form-select" onchange="document.getElementById('filter-form').submit()">
+                            <option value="">All Sites</option>
+                            {% for site in sites %}
+                            <option value="{{ site.id }}" {% if site_filter|int == site.id %}selected{% endif %}>
+                                {{ site.site_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                   <label for="role_filter" class="filter-labels text-sm mb-0 text-capitalize">Filter By Role</label>
+                        <select name="role_filter" id="role_filter" class="form-select-box form-select" onchange="document.getElementById('filter-form').submit()">
+                            <option value="">All Roles</option>
+                            {% for role in roles %}
+                            <option value="{{ role.id }}" {% if request.args.get('role_filter', '')|int == role.id %}selected{% endif %}>
+                                {{ role.role_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                          <label for="grade_filter" class="filter-labels text-sm mb-0 text-capitalize">Filter By Grade</label>
+                        <select name="grade_filter" id="grade_filter" class="form-select-box form-select" onchange="document.getElementById('filter-form').submit()">
+                            <option value="">All Grades</option>
+                            <option value="KN" {% if request.args.get('grade_filter') == 'KN' %}selected{% endif %}>Kindergarten</option>
+                            <option value="1" {% if request.args.get('grade_filter') == '1' %}selected{% endif %}>1st Grade</option>
+                            <option value="2" {% if request.args.get('grade_filter') == '2' %}selected{% endif %}>2nd Grade</option>
+                            <option value="3" {% if request.args.get('grade_filter') == '3' %}selected{% endif %}>3rd Grade</option>
+                            <option value="4" {% if request.args.get('grade_filter') == '4' %}selected{% endif %}>4th Grade</option>
+                            <option value="5" {% if request.args.get('grade_filter') == '5' %}selected{% endif %}>5th Grade</option>
+                            <option value="6" {% if request.args.get('grade_filter') == '6' %}selected{% endif %}>6th Grade</option>
+                            <option value="7" {% if request.args.get('grade_filter') == '7' %}selected{% endif %}>7th Grade</option>
+                            <option value="8" {% if request.args.get('grade_filter') == '8' %}selected{% endif %}>8th Grade</option>
+                            <option value="9" {% if request.args.get('grade_filter') == '9' %}selected{% endif %}>9th Grade</option>
+                            <option value="10" {% if request.args.get('grade_filter') == '10' %}selected{% endif %}>10th Grade</option>
+                            <option value="11" {% if request.args.get('grade_filter') == '11' %}selected{% endif %}>11th Grade</option>
+                            <option value="12" {% if request.args.get('grade_filter') == '12' %}selected{% endif %}>12th Grade</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <label for="status_filter" class="filter-labels text-sm mb-0 text-capitalize">Filter By Status</label>
+                        <select name="status_filter" id="status_filter" class="form-select-box form-select" onchange="document.getElementById('filter-form').submit()">
+                            <option value="">All Statuses</option>
+                            <option value="Active" {% if request.args.get('status_filter') == 'Active' %}selected{% endif %}>Active</option>
+                            <option value="Inactive" {% if request.args.get('status_filter') == 'Inactive' %}selected{% endif %}>Inactive</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <label for="room_filter" class="filter-labels text-sm mb-0 text-capitalize">Filter By Location</label>
+                        <select name="room_filter" id="room_filter" class="form-select-box form-select" onchange="document.getElementById('filter-form').submit()">
+                            <option value="">All Rooms</option>
+                            {% for room in rooms %}
+                            <option value="{{ room }}" {% if request.args.get('room_filter') == room %}selected{% endif %}>{{ room }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+    <!-- end search box card -->
+
+    <div class="table-per-page-section mt-4">
+          <div class="row justify-content-between">
+            <div class="col-4">
+              <form method="get" class="d-flex">
+                <label for="per_page">Items per page: </label>
+                <select name="per_page" id="per_page" class="per-page-drop" onchange="this.form.submit()">
+                    <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+                    <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
+                    <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+                </select>
+                
+            </form>
+            </div>
+               <div class="col-auto text-end d-flex gap-2">
+               {% if current_user.is_admin %}
+              <a href="{{ url_for('routes.bulk_upload_patrons') }}" type="button" class="btn reset-button-box shadow-dark add-table-button">Bulk Upload</a>
+              <a href="{{ url_for('routes.add_patron') }}" type="button" class="btn bg-gradient-main add-table-button shadow-dark">Add Patron</a>
+               {% endif %}
+            </div>
+          </div>
+        </div>
+    <!-- pause main content card -->
+
+
+
+
+  
+
+
+        <!-- main content table -->
+          <div class="table-responsive">
+            <table class="table align-items-center mb-0 table-striped">
+              <thead>
+                <tr>
+                  <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center" >ID</th>
+                  <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Grade</th>
+                  <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Name</th>
+                  <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Role</th>
+                  <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Room</th>
+                  <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Email</th>
+                  <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Phone</th>
+                  <th class="text-uppercase text-xxs font-weight-bolder align-middle text-center">Devices</th>
+                  <th class="text-uppercase text-xxs font-weight-bolder align-middle text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for patron in patrons %}
+                <tr class="table-highlight-row {{ 'text-muted' if patron.status == 'Inactive' else '' }}">
+                        <td class="text-xs text-secondary mb-0">{{ patron.badge_id }}</td>
+
+                  <td class="align-middle text-center">
+                    <span class="text-secondary text-xs font-weight-bold">{{ patron.grade }}</span>
+                  </td>
+
+                  <td class="mb-0 text-sm text-capitalize align-middle">
+                    {{ patron.first_name }} {{ patron.middle_name }} {{ patron.last_name }}
+                  </td>
+                  <td class="align-middle text-center">
+                    <span class="text-secondary text-xs font-weight-bold">{{ patron.role.role_name }}</span>
+                  </td>
+                  <td class="align-middle text-center">
+                    <span class="text-secondary text-xs font-weight-bold">{{ patron.rm_num }}</span>
+                  </td>
+
+                  <td class="align-middle text-center">
+                    <span class="text-secondary text-xs font-weight-bold">{{ patron.email}}</span>
+                  </td>
+                  <td class="align-middle text-center">
+                    <span class="text-secondary text-xs font-weight-bold">{{ patron.phone }}</span>
+                  </td>
+                  <td class="align-middle text-center">
+                    <span class="text-secondary text-xs font-weight-bold">{{ patron.devices|selectattr('return_at', 'none')|list|length }}</span>
+                  </td>
+                  <td class="align-middle">
+                    <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ url_for('routes.patron_details', patron_id=patron.id) }}" type="button" class="btn table-button-edit font-weight-bold" aria-label="View {{ patron.first_name }} {{ patron.last_name }}">
+                      <i class="material-symbols-rounded position-relative text-lg" aria-hidden="true">visibility</i>
+                    </a>
+                    {% if current_user.is_admin %}
+                    <a href="{{ url_for('routes.edit_patron', patron_id=patron.id) }}" type="button" class="btn table-button-edit font-weight-bold" aria-label="Edit {{ patron.first_name }} {{ patron.last_name }}">
+                      <i class="material-symbols-rounded position-relative text-lg" aria-hidden="true">edit</i>
+                    </a>
+                    {% endif %}
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <nav aria-label="Page navigation">
+            <ul class="pagination">
+              <!-- Render pagination links from flask-paginate -->
+              {{ pagination.links }}
+            </ul>
+        <!-- end content table -->
+
+          
+    <!-- continue main content card -->
+        </div>
+      </div>
+    </div>
+  </div>
+    <!-- End main content card -->
+
+  {% endblock %}
