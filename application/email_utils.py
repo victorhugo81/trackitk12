@@ -18,9 +18,9 @@ def send_temp_password_email(user, temp_password):
             )
         )
         mail.send(msg)
-        current_app.logger.info(f"Temporary password email sent to {user.email}")
+        current_app.logger.info(f"Temporary password email sent to user_id={user.id}")
     except Exception as e:
-        current_app.logger.error(f"Failed to send temp password email to {user.email}: {type(e).__name__}: {e}", exc_info=True)
+        current_app.logger.error(f"Failed to send temp password email to user_id={user.id}: {type(e).__name__}: {e}", exc_info=True)
         raise
 
 
@@ -38,7 +38,7 @@ def send_password_updated_email(user):
             )
         )
         mail.send(msg)
-        current_app.logger.info(f"Password updated notification sent to {user.email}")
+        current_app.logger.info(f"Password updated notification sent to user_id={user.id}")
     except Exception as e:
-        current_app.logger.error(f"Failed to send password updated email to {user.email}: {type(e).__name__}: {e}", exc_info=True)
+        current_app.logger.error(f"Failed to send password updated email to user_id={user.id}: {type(e).__name__}: {e}", exc_info=True)
         raise

@@ -236,6 +236,7 @@ def serve_attachment(filename):
 # ****************** Change Password *******************************
 @routes_blueprint.route('/change-password', methods=['POST'])
 @login_required
+@limiter.limit("5 per minute", key_func=lambda: str(current_user.id))
 def change_password():
     """
     Handle password change requests securely.
@@ -282,13 +283,9 @@ def change_password():
             
         # Verify current password is correct
         if not check_password_hash(user.password_hash, current_password):
-            # Use consistent timing to prevent timing attacks
-            from time import sleep
-            sleep(0.5)  # Small delay to prevent rapid guessing
             return jsonify({"success": False, "message": "Current password is incorrect"}), 401
             
-        # Hash the new password using werkzeug security functions
-        password_hash = generate_password_hash(new_password, method='pbkdf2:sha256:150000')
+        password_hash = generate_password_hash(new_password)
         
         # Update the password in the database
         user.password_hash = password_hash
@@ -443,7 +440,7 @@ def test_email():
             )
         )
         mail.send(msg)
-        current_app.logger.info(f"Test email sent to {recipient} by user {current_user.id}")
+        current_app.logger.info(f"Test email sent by user_id={current_user.id}")
         return jsonify({'success': True, 'message': f'Test email sent to {recipient}.'})
     except ConnectionRefusedError:
         current_app.logger.error(f"Test email failed: connection refused to {current_app.config.get('MAIL_SERVER')}:{current_app.config.get('MAIL_PORT')}")
@@ -761,6 +758,8 @@ def edit_user(user_id):
             user.site_id = form.site_id.data
             changes_made = True
         if user.role_id != form.role_id.data:
+            if not current_user.is_admin:
+                abort(403)
             user.role_id = form.role_id.data
             changes_made = True
         # Validate and update password only if provided

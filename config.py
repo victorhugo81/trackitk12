@@ -12,6 +12,7 @@ class Config:
     # Falls back to SECRET_KEY value so existing dev environments need no change.
     ENCRYPTION_KEY = os.environ.get('ENCRYPTION_KEY', os.environ.get('SECRET_KEY', 'dev-secret-key'))
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB hard limit on all request bodies
 
     # Database connection string, with a fallback for development
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
