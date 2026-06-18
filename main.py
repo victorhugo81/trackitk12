@@ -42,7 +42,21 @@ def create_app(config_name=None):
 
     # Use environment-specific configuration
     app.config.from_object(config[config_name])
-    
+
+    # Validate required secrets at startup — from_object() reads class attributes and
+    # never calls __init__, so the guard in ProductionConfig.__init__ is dead code.
+    if config_name == 'production':
+        if app.config.get('SECRET_KEY') == 'dev-secret-key':
+            raise RuntimeError(
+                "SECRET_KEY must be set to a strong random value in production. "
+                "Set the SECRET_KEY environment variable."
+            )
+        if app.config.get('ENCRYPTION_KEY') == 'dev-secret-key':
+            raise RuntimeError(
+                "ENCRYPTION_KEY must be set to a strong random value in production. "
+                "Set the ENCRYPTION_KEY environment variable."
+            )
+
     # Warn when rate limiter falls back to in-memory storage in non-debug mode.
     # Set RATELIMIT_STORAGE_URI=redis://localhost:6379 (or similar) in production.
     if not app.debug and app.config.get('RATELIMIT_STORAGE_URI', 'memory://') == 'memory://':
@@ -117,7 +131,7 @@ def create_app(config_name=None):
                 app.config['MAIL_USE_SSL'] = bool(org.mail_use_ssl)
                 app.config['MAIL_USERNAME'] = org.mail_username
                 app.config['MAIL_PASSWORD'] = decrypt_mail_password(
-                    org.mail_password or '', app.config['SECRET_KEY']
+                    org.mail_password or '', app.config['ENCRYPTION_KEY']
                 )
                 app.config['MAIL_DEFAULT_SENDER'] = org.mail_default_sender
                 mail.init_app(app)

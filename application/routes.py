@@ -172,7 +172,7 @@ def login():
 
     form = LoginForm()
     if form.validate_on_submit():
-        key = current_app.config['SECRET_KEY']
+        key = current_app.config['ENCRYPTION_KEY']
         user = User.query.filter_by(email_hash=hash_email(form.email.data.strip(), key)).first()
         if user:
             if user.status != 'Active':
@@ -390,7 +390,7 @@ def email_config():
         organization.mail_username = email_form.mail_username.data or None
         if email_form.mail_password.data:
             organization.mail_password = encrypt_mail_password(
-                email_form.mail_password.data, current_app.config['SECRET_KEY']
+                email_form.mail_password.data, current_app.config['ENCRYPTION_KEY']
             )
         organization.mail_default_sender = email_form.mail_default_sender.data or None
         db.session.commit()
@@ -402,7 +402,7 @@ def email_config():
         current_app.config['MAIL_USE_SSL'] = bool(organization.mail_use_ssl)
         current_app.config['MAIL_USERNAME'] = organization.mail_username
         current_app.config['MAIL_PASSWORD'] = decrypt_mail_password(
-            organization.mail_password or '', current_app.config['SECRET_KEY']
+            organization.mail_password or '', current_app.config['ENCRYPTION_KEY']
         )
         current_app.config['MAIL_DEFAULT_SENDER'] = organization.mail_default_sender
         mail.init_app(current_app)
@@ -658,7 +658,7 @@ def add_user():
     form.site_id.choices = [(site.id, site.site_name) for site in Site.query.all()]
     if form.validate_on_submit():
         # Check if a user with the same email already exists
-        key = current_app.config['SECRET_KEY']
+        key = current_app.config['ENCRYPTION_KEY']
         existing_user = User.query.filter_by(email_hash=hash_email(form.email.data.strip(), key)).first()
         if existing_user:
             flash('A user with this email already exists. Please use a different email.', 'danger')
@@ -729,7 +729,7 @@ def edit_user(user_id):
     form.site_id.choices = [(site.id, site.site_name) for site in Site.query.all()]
     if form.validate_on_submit():
         # Check if a user with the same email already exists
-        key = current_app.config['SECRET_KEY']
+        key = current_app.config['ENCRYPTION_KEY']
         existing_user = User.query.filter(User.email_hash == hash_email(form.email.data.strip(), key), User.id != user.id).first()
         if existing_user:
             flash('A user with this email already exists. Please use a different email.', 'danger')
@@ -823,7 +823,7 @@ def upload_users():
     ftp_username_plain = ''
     schedule_time = ''
     if org:
-        key = current_app.config['SECRET_KEY']
+        key = current_app.config['ENCRYPTION_KEY']
         ftp_host_plain     = decrypt_mail_password(org.ftp_host_enc or '', key)
         ftp_username_plain = decrypt_mail_password(org.ftp_username_enc or '', key)
         if org.ftp_schedule_hour is not None:
@@ -1062,7 +1062,7 @@ def bulk_upload_users():
                     csv_emails.add(row['email'].strip())
 
                 # Upsert users
-                _key = current_app.config['SECRET_KEY']
+                _key = current_app.config['ENCRYPTION_KEY']
                 for row in rows:
                     site_id = site_cache[row['site_name'].strip()]
                     existing_user = User.query.filter_by(email_hash=hash_email(row['email'].strip(), _key)).first()
@@ -1142,7 +1142,7 @@ def ftp_save_settings():
     """Save FTP credentials and schedule settings into the Organization record."""
     is_admin()
     org = db.get_or_404(Organization, 1)
-    key = current_app.config['SECRET_KEY']
+    key = current_app.config['ENCRYPTION_KEY']
 
     # --- Credentials ---
     raw_host = re.sub(r'^ftps?://', '', request.form.get('ftp_host', '').strip(), flags=re.IGNORECASE)
@@ -1230,7 +1230,7 @@ def ftp_bulk_upload_users():
     # Fall back to saved org credentials (decrypt) if form fields are blank
     org = db.session.get(Organization, 1)
     if org:
-        key = current_app.config['SECRET_KEY']
+        key = current_app.config['ENCRYPTION_KEY']
         if not ftp_host and org.ftp_host_enc:
             ftp_host = decrypt_mail_password(org.ftp_host_enc, key)
         if not ftp_username and org.ftp_username_enc:
@@ -1322,7 +1322,7 @@ def ftp_bulk_upload_users():
             csv_emails.add(row['email'].strip().lower())
 
         # Second pass: upsert users
-        _ftp_key = current_app.config['SECRET_KEY']
+        _ftp_key = current_app.config['ENCRYPTION_KEY']
         for row in rows:
             site = _find_site(row['site_name'])
             existing_user = User.query.filter_by(email_hash=hash_email(row['email'].strip(), _ftp_key)).first()
@@ -2184,6 +2184,8 @@ def add_device():
 @routes_blueprint.route('/edit_device/<int:device_id>', methods=['GET', 'POST'])
 @login_required
 def edit_device(device_id):
+    if not (current_user.is_admin or current_user.is_tech_role):    
+        abort(403)
     device = db.get_or_404(Device, device_id)
     form = DeviceForm(obj=device)
 
@@ -2230,6 +2232,8 @@ def edit_device(device_id):
 @routes_blueprint.route('/device/<int:device_id>/add_comment', methods=['POST'])
 @login_required
 def add_device_comment(device_id):
+    if not (current_user.is_admin or current_user.is_tech_role):
+        abort(403)
     db.get_or_404(Device, device_id)
     content = request.form.get('content', '').strip()
     if content:
@@ -2240,9 +2244,11 @@ def add_device_comment(device_id):
     return redirect(url_for('routes.edit_device', device_id=device_id))
 
 
-@routes_blueprint.route('/delete_device/<int:device_id>', methods=['POST', 'GET'])
+@routes_blueprint.route('/delete_device/<int:device_id>', methods=['POST'])
 @login_required
 def delete_device(device_id):
+    if not (current_user.is_admin or current_user.is_tech_role):
+        abort(403)
     device = db.get_or_404(Device, device_id)
     db.session.delete(device)
     db.session.commit()
@@ -2617,7 +2623,7 @@ def add_patron():
     form.site_id.choices = [(site.id, site.site_name) for site in Site.query.all()]
     if form.validate_on_submit():
         # Check if a Patron with the same email already exists
-        _key = current_app.config['SECRET_KEY']
+        _key = current_app.config['ENCRYPTION_KEY']
         existing_user = Patron.query.filter_by(email_hash=hash_email(form.email.data.strip(), _key)).first()
         if existing_user:
             flash('A patron with this email already exists. Please use a different email.', 'danger')
@@ -2661,7 +2667,7 @@ def edit_patron(patron_id):
     form.site_id.choices = [(site.id, site.site_name) for site in Site.query.all()]
     if form.validate_on_submit():
         # Check if a Patron with the same email already exists (excluding the current patron)
-        _key = current_app.config['SECRET_KEY']
+        _key = current_app.config['ENCRYPTION_KEY']
         existing_user = Patron.query.filter_by(email_hash=hash_email(form.email.data.strip(), _key)).first()
         if existing_user and existing_user.id != patron_id:
             flash('A patron with this email already exists. Please use a different email.', 'danger')
@@ -2691,6 +2697,8 @@ def edit_patron(patron_id):
 @routes_blueprint.route('/patron_details/<int:patron_id>', methods=['GET'])
 @login_required
 def patron_details(patron_id):
+    if not (current_user.is_admin or current_user.is_tech_role):
+        abort(403)
     patron = db.get_or_404(Patron, patron_id)
     return render_template('patron_details.html', patron=patron,
                            current_page_name='Patron Details',
@@ -2753,6 +2761,8 @@ def search_available_devices():
 @routes_blueprint.route('/assign_device/<int:patron_id>', methods=['POST'])
 @login_required
 def assign_device(patron_id):
+    if not (current_user.is_admin or current_user.is_tech_role):
+        abort(403)
     patron = db.get_or_404(Patron, patron_id)
     device_id = request.form.get('device_id', type=int)
     device = db.get_or_404(Device, device_id)
@@ -2768,6 +2778,8 @@ def assign_device(patron_id):
 @routes_blueprint.route('/return_device/<int:device_id>', methods=['POST'])
 @login_required
 def return_device(device_id):
+    if not (current_user.is_admin or current_user.is_tech_role):
+        abort(403)
     device = db.get_or_404(Device, device_id)
     patron_id = device.assigned_to_id
     device.return_at = datetime.now(timezone.utc)

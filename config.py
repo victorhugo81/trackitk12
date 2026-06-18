@@ -7,6 +7,10 @@ load_dotenv()
 class Config:
     # Flask secret key for session management and CSRF protection
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key')  # Fallback for development
+    # Separate key used exclusively for encrypting PII in the database (emails, phones, FTP creds).
+    # Set ENCRYPTION_KEY independently so SECRET_KEY can be rotated without losing encrypted data.
+    # Falls back to SECRET_KEY value so existing dev environments need no change.
+    ENCRYPTION_KEY = os.environ.get('ENCRYPTION_KEY', os.environ.get('SECRET_KEY', 'dev-secret-key'))
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Database connection string, with a fallback for development
@@ -37,13 +41,8 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     DEBUG = False  # Disable debug mode for production
     SESSION_COOKIE_SECURE = True     # Require HTTPS for session cookie
-
-    def __init__(self):
-        if self.SECRET_KEY == 'dev-secret-key':
-            raise RuntimeError(
-                "SECRET_KEY must be set to a strong random value in production. "
-                "Set the SECRET_KEY environment variable."
-            )
+    # Secret validation is enforced in create_app() in main.py because from_object()
+    # loads class attributes without calling __init__, making __init__ guards dead code.
 
 class TestingConfig(Config):
     TESTING = True
@@ -53,6 +52,7 @@ class TestingConfig(Config):
     WTF_CSRF_ENABLED = False        # Disable CSRF for test client form posts
     RATELIMIT_ENABLED = False       # Disable rate limiting in tests
     SECRET_KEY = 'test-secret-key-for-testing-only-not-production'
+    ENCRYPTION_KEY = 'test-secret-key-for-testing-only-not-production'
 
 
 # Dictionary to manage different configurations for different environments

@@ -65,13 +65,13 @@ class User(db.Model, UserMixin):
     def email(self):
         from flask import current_app
         from .utils import decrypt_field
-        return decrypt_field(self.email_enc or '', current_app.config['SECRET_KEY'])
+        return decrypt_field(self.email_enc or '', current_app.config['ENCRYPTION_KEY'])
 
     @email.setter
     def email(self, value):
         from flask import current_app
         from .utils import encrypt_field, hash_email
-        key = current_app.config['SECRET_KEY']
+        key = current_app.config['ENCRYPTION_KEY']
         self.email_enc  = encrypt_field(value or '', key)
         self.email_hash = hash_email(value or '', key)
 
@@ -129,13 +129,13 @@ class Patron(db.Model):
     def email(self):
         from flask import current_app
         from .utils import decrypt_field
-        return decrypt_field(self.email_enc or '', current_app.config['SECRET_KEY'])
+        return decrypt_field(self.email_enc or '', current_app.config['ENCRYPTION_KEY'])
 
     @email.setter
     def email(self, value):
         from flask import current_app
         from .utils import encrypt_field, hash_email
-        key = current_app.config['SECRET_KEY']
+        key = current_app.config['ENCRYPTION_KEY']
         self.email_enc  = encrypt_field(value or '', key)
         self.email_hash = hash_email(value or '', key)
 
@@ -143,13 +143,13 @@ class Patron(db.Model):
     def phone(self):
         from flask import current_app
         from .utils import decrypt_field
-        return decrypt_field(self.phone_enc or '', current_app.config['SECRET_KEY'])
+        return decrypt_field(self.phone_enc or '', current_app.config['ENCRYPTION_KEY'])
 
     @phone.setter
     def phone(self, value):
         from flask import current_app
         from .utils import encrypt_field
-        self.phone_enc = encrypt_field(value or '', current_app.config['SECRET_KEY']) if value else None
+        self.phone_enc = encrypt_field(value or '', current_app.config['ENCRYPTION_KEY']) if value else None
 
     # Relationship: one patron -> many devices
     devices = db.relationship("Device", foreign_keys="Device.assigned_to_id", back_populates="assigned_to", lazy=True)

@@ -135,7 +135,7 @@ def logout(client):
 def _inject_user(app, client, email):
     """Set the Flask-Login session for *email* directly, bypassing the login form."""
     from application.utils import hash_email
-    key = app.config['SECRET_KEY']
+    key = app.config['ENCRYPTION_KEY']
     with app.app_context():
         from application.models import User
         user = User.query.filter_by(email_hash=hash_email(email, key)).first()
