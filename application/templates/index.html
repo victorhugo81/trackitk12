@@ -66,14 +66,14 @@
       <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
         <a href="{{ url_for('routes.devices') }}">
           <div class="small-cards-dashboard card">
-              <div class="card-header p-2 ps-3">
-                  <div class="d-flex justify-content-between">
+              <div class="card-header p-3">
+                  <div class="d-flex justify-content-between align-items-center">
                       <div>
-                          <p class="text-sm mb-0 text-uppercase text-dark">Total Devices</p>
+                          <p class="text-xs mb-1">Total Devices</p>
                           <h4 class="mb-0">{{ total_devices }}</h4>
                       </div>
-                      <div class="icon icon-md icon-shape bg-gradient-main shadow-dark shadow text-center border-radius-lg">
-                          <i class="material-symbols-rounded opacity-10">devices</i>
+                      <div class="icon icon-md icon-shape bg-gradient-main">
+                          <i class="material-symbols-rounded" aria-hidden="true">devices</i>
                       </div>
                   </div>
               </div>
@@ -87,14 +87,14 @@
       <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
         <a href="{{ url_for('routes.devices', availability_filter='checked_out') }}">
           <div class="small-cards-dashboard card">
-              <div class="card-header p-2 ps-3">
-                  <div class="d-flex justify-content-between">
+              <div class="card-header p-3">
+                  <div class="d-flex justify-content-between align-items-center">
                       <div>
-                          <p class="text-sm mb-0 text-uppercase text-dark">Checked Out</p>
+                          <p class="text-xs mb-1">Checked Out</p>
                           <h4 class="mb-0">{{ checked_out }}</h4>
                       </div>
-                      <div class="icon icon-md icon-shape bg-gradient-main shadow-dark shadow text-center border-radius-lg">
-                          <i class="material-symbols-rounded opacity-10">assignment_ind</i>
+                      <div class="icon icon-md icon-shape bg-gradient-main">
+                          <i class="material-symbols-rounded" aria-hidden="true">assignment_ind</i>
                       </div>
                   </div>
               </div>
@@ -109,14 +109,14 @@
       <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
         <a href="{{ url_for('routes.devices', availability_filter='available') }}">
           <div class="small-cards-dashboard card">
-              <div class="card-header p-2 ps-3">
-                  <div class="d-flex justify-content-between">
+              <div class="card-header p-3">
+                  <div class="d-flex justify-content-between align-items-center">
                       <div>
-                          <p class="text-sm mb-0 text-uppercase text-dark">Available</p>
+                          <p class="text-xs mb-1">Available</p>
                           <h4 class="mb-0">{{ available }}</h4>
                       </div>
-                      <div class="icon icon-md icon-shape bg-gradient-main shadow-dark shadow text-center border-radius-lg">
-                          <i class="material-symbols-rounded opacity-10">check_circle</i>
+                      <div class="icon icon-md icon-shape bg-gradient-success">
+                          <i class="material-symbols-rounded" aria-hidden="true">check_circle</i>
                       </div>
                   </div>
               </div>
@@ -129,14 +129,14 @@
       <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
         <a href="{{ url_for('routes.devices', availability_filter='in_repair') }}">
           <div class="small-cards-dashboard card">
-              <div class="card-header p-2 ps-3">
-                  <div class="d-flex justify-content-between">
+              <div class="card-header p-3">
+                  <div class="d-flex justify-content-between align-items-center">
                       <div>
-                          <p class="text-sm mb-0 text-uppercase text-dark">In Repair</p>
+                          <p class="text-xs mb-1">In Repair</p>
                           <h4 class="mb-0">{{ in_repair }}</h4>
                       </div>
-                      <div class="icon icon-md icon-shape bg-gradient-main shadow-dark shadow text-center border-radius-lg">
-                          <i class="material-symbols-rounded opacity-10">build</i>
+                      <div class="icon icon-md icon-shape bg-gradient-warning">
+                          <i class="material-symbols-rounded" aria-hidden="true">build</i>
                       </div>
                   </div>
               </div>
