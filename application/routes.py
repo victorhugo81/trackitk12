@@ -121,20 +121,24 @@ def is_admin():
     """
     Check if the current user has admin privileges.
     Abort with 403 Forbidden if the user is not an admin.
-    
-    Assumes role_id 1 represents Admin status.
+
+    Delegates to User.is_admin (role-name based) so every authorization
+    check in the app uses a single source of truth — do not reintroduce
+    a role_id-based check here, it can drift out of sync with role names.
     """
-    if not current_user.is_authenticated or current_user.role_id != 1:  # Assuming 1 = Admin
+    if not current_user.is_authenticated or not current_user.is_admin:
         abort(403)
 
 def is_tech_role():
     """
     Check if the current user has a technical role.
     Abort with 403 Forbidden if the user is not in a tech role.
-    
-    Technical roles are Specialist (role_id=2) and Technician (role_id=3).
+
+    Delegates to User.is_tech_role (role-name based) so every authorization
+    check in the app uses a single source of truth — do not reintroduce
+    a role_id-based check here, it can drift out of sync with role names.
     """
-    if not current_user.is_authenticated or current_user.role_id not in [2, 3]:  # Assuming 2 = Specialist, 3 = Technician
+    if not current_user.is_authenticated or not current_user.is_tech_role:
         abort(403)
 
 # ****************** Forbidden Error Page *******************************
@@ -151,6 +155,12 @@ def forbidden_error(error):
         tuple: Rendered error template and 403 status code
     """
     return render_template('error.html'), 403
+
+
+# Fixed-cost hash compared against when no matching account exists, so the
+# login endpoint takes roughly the same time whether or not the email is
+# registered — prevents timing-based account/email enumeration.
+_LOGIN_DUMMY_HASH = generate_password_hash(secrets.token_urlsafe(32))
 
 
 # ****************** Login Page *******************************
@@ -191,6 +201,10 @@ def login():
                 db.session.commit()
                 flash('Login failed. Please check your credentials.', 'danger')
         else:
+            # No account with this email — still run a password hash
+            # comparison so response time matches the "wrong password"
+            # branch above and doesn't leak whether the email is registered.
+            check_password_hash(_LOGIN_DUMMY_HASH, form.password.data)
             flash('Login failed. Please check your credentials.', 'danger')
 
     return render_template(
@@ -720,6 +734,15 @@ def edit_user(user_id):
     if not (current_user.is_admin or current_user.is_tech_role):
         abort(403)
     user = db.get_or_404(User, user_id)
+    # Non-admins may edit their own basic profile fields, but may never edit
+    # *another* admin/tech account, and may never reset a password or change
+    # a role here (regardless of whose account it is) — prevents a
+    # Technician/Specialist from escalating to Admin via another user's
+    # record. Self password changes go through the dedicated /profile flow,
+    # which verifies the current password first.
+    if not current_user.is_admin:
+        if user.id != current_user.id and (user.is_admin or user.is_tech_role):
+            abort(403)
     form = UserForm(obj=user)
     # Populate dynamic choices for role_id and site_id
     form.role_id.choices = [(role.id, role.role_name) for role in Role.query.all()]
@@ -762,9 +785,12 @@ def edit_user(user_id):
                 abort(403)
             user.role_id = form.role_id.data
             changes_made = True
-        # Validate and update password only if provided
+        # Validate and update password only if provided — only admins may
+        # reset another user's password.
         password_changed = False
         if form.password.data:
+            if not current_user.is_admin:
+                abort(403)
             password = form.password.data
             is_valid, error_message = validate_password(password)
             if not is_valid:
@@ -2708,6 +2734,8 @@ def patron_details(patron_id):
 @routes_blueprint.route('/search_patrons')
 @login_required
 def search_patrons():
+    if not (current_user.is_admin or current_user.is_tech_role):
+        abort(403)
     q = request.args.get('q', '').strip()
     query = Patron.query.filter_by(status='Active')
     if q:

@@ -8,7 +8,7 @@
     </div>
   </div>
 </footer>
-<script>document.getElementById('copy-year').textContent = new Date().getFullYear();</script>
+<script nonce="{{ csp_nonce }}">document.getElementById('copy-year').textContent = new Date().getFullYear();</script>
 
 <!-- End footer -->
 </div>
@@ -17,7 +17,7 @@
 
 
 <!--   close warning messages  -->
-<script>
+<script nonce="{{ csp_nonce }}">
   setTimeout(() => {
     const alerts = document.querySelectorAll('.alert');
     alerts.forEach(alert => alert.classList.remove('show'));
@@ -26,7 +26,7 @@
 
 
 <!-- Delete confirmation modal -->
-<script>
+<script nonce="{{ csp_nonce }}">
 (function () {
   var modal = document.getElementById('deleteModal');
   if (!modal) return;
@@ -42,7 +42,7 @@
 </script>
 
 <!-- Mobile menu toggle -->
-<script>
+<script nonce="{{ csp_nonce }}">
 (function () {
   const toggle = document.querySelector('.mobile-menu-toggle');
   const wrapper = document.getElementById('menuToggle');
@@ -80,7 +80,7 @@
 </script>
 
 <!-- Required field indicators -->
-<script>
+<script nonce="{{ csp_nonce }}">
 (function () {
   var main = document.getElementById('content');
   if (!main) return;
@@ -119,7 +119,7 @@
 </script>
 
 <!-- Unsaved changes guard — watches all POST forms inside main content -->
-<script>
+<script nonce="{{ csp_nonce }}">
 (function () {
   var dirty = false;
   var main = document.getElementById('content');
@@ -149,7 +149,7 @@
 <script src="{{ url_for('static', filename='js/plugins/perfect-scrollbar.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/plugins/smooth-scrollbar.min.js') }}"></script>
 
-<script>
+<script nonce="{{ csp_nonce }}">
 var win = navigator.platform.indexOf('Win') > -1;
 if (win && document.querySelector('#sidenav-scrollbar')) {
 var options = {

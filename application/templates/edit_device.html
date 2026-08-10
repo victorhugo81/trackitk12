@@ -144,7 +144,7 @@
 
 
 
-<script>
+<script nonce="{{ csp_nonce }}">
     document.querySelectorAll('.local-time').forEach(el => {
         const d = new Date(el.dataset.utc);
         el.textContent = d.toLocaleString('en-US', {
@@ -209,7 +209,7 @@ document.querySelector(".scroll-down").onclick = () => {
     </div>
 </div>
 
-<script>
+<script nonce="{{ csp_nonce }}">
 (function () {
     const hbox = document.getElementById('historyBox');
     document.querySelector('.scroll-up-hist').onclick   = () => hbox.scrollBy({ top: -100, behavior: 'smooth' });
@@ -250,7 +250,7 @@ document.querySelector(".scroll-down").onclick = () => {
     </div>
 </div>
 
-<script>
+<script nonce="{{ csp_nonce }}">
 (function () {
     const input = document.getElementById('patronSearchInput');
     const tbody = document.getElementById('patronSearchResults');

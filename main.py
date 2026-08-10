@@ -1,5 +1,6 @@
 import os
-from flask import Flask
+import secrets
+from flask import Flask, g
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_wtf.csrf import CSRFProtect
@@ -95,6 +96,19 @@ def create_app(config_name=None):
     from application.routes import routes_blueprint
     app.register_blueprint(routes_blueprint)
 
+    # Per-request CSP nonce — registered as an app-level (not blueprint-level)
+    # before_request hook so it always runs first and g.csp_nonce is set even
+    # if a later before_request hook (e.g. enforce_password_change) redirects
+    # early. Exposed to Jinja so templates can do <script nonce="{{ csp_nonce }}">
+    # instead of relying on 'unsafe-inline'.
+    @app.before_request
+    def set_csp_nonce():
+        g.csp_nonce = secrets.token_urlsafe(16)
+
+    @app.context_processor
+    def inject_csp_nonce():
+        return dict(csp_nonce=getattr(g, 'csp_nonce', ''))
+
     # Security headers applied to every response
     @app.after_request
     def set_security_headers(response):
@@ -102,9 +116,14 @@ def create_app(config_name=None):
         response.headers['X-Frame-Options'] = 'SAMEORIGIN'
         response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
         response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()'
+        nonce = getattr(g, 'csp_nonce', '')
         response.headers['Content-Security-Policy'] = (
             "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; "
+            f"script-src 'self' 'nonce-{nonce}' https://cdnjs.cloudflare.com; "
+            # style-src still allows 'unsafe-inline': templates use many inline
+            # style="..." attributes, which nonces cannot cover (only <style>
+            # blocks). CSS injection is a materially lower-severity primitive
+            # than script injection, so script-src is the one worth tightening.
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
             "font-src 'self' https://fonts.gstatic.com; "
             "img-src 'self' data: blob:; "

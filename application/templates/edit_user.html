@@ -113,7 +113,7 @@
 
                 </form>
 
-<script>
+<script nonce="{{ csp_nonce }}">
 document.getElementById('sendTempPasswordBtn').addEventListener('click', function () {
     if (!confirm('This will reset the user\'s password and send them a temporary one by email. Continue?')) return;
 

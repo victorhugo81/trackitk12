@@ -195,7 +195,7 @@
 </div>
 <!-- End main content card -->
 
-<script>
+<script nonce="{{ csp_nonce }}">
 document.getElementById('sendTestEmail').addEventListener('click', function () {
     var recipient = document.getElementById('testRecipient').value.trim();
     var resultDiv = document.getElementById('testEmailResult');
