@@ -82,21 +82,25 @@
 </div>
 
 <!-- About modal -->
-<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog"
-     aria-labelledby="aboutModalLabel" aria-modal="true">
+<div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <div class="modal-header border-0 pb-0">
-        <h5 class="modal-title" id="aboutModalLabel">About TrackITK12</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-header position-relative border-0 pb-0">
+        <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="w-100 text-center pt-2">
+          <img src="{{ url_for('static', filename='img/favicon.png') }}" class="about-modal-logo mb-2" alt="">
+          <h5 class="modal-title" id="aboutModalLabel">TrackITK12</h5>
+        </div>
       </div>
-      <div class="modal-body pt-2 text-center">
-        <img src="{{ url_for('static', filename='img/favicon.png') }}" class="mb-3" style="max-height:6rem;" alt="TrackITK12">
-        <p class="mb-1">Device Inventory Management System for K-12 IT teams.</p>
-        <p class="mb-0 text-muted text-sm">Version {{ app_version or 'Unknown' }} &middot; &copy; <span id="about-copy-year"></span> TrackITK12</p>
+      <div class="modal-body text-center">
+        <p class="text-sm text-muted mb-3">web-based device inventory and checkout tracking system designed for K-12 school districts. It helps IT staff manage device assignments, track repairs, monitor availability, and maintain an audit trail of all device activity.</p>
+        {% if app_version %}
+        <p class="mb-1"><span class="about-modal-version">Version {{ app_version }}</span></p>
+        {% endif %}
+        <p class="text-xs text-muted mb-0">&copy; <span id="about-copy-year"></span> TrackITK12. All rights reserved.</p>
       </div>
-      <div class="modal-footer border-0 pt-2">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>

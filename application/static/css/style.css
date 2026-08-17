@@ -959,6 +959,18 @@ hr.horizontal.dark { background-color: var(--color-border-strong); }
   color: var(--color-primary);
   text-decoration: underline;
 }
+
+.about-modal-logo { display: block; max-height: 8rem; margin: 0 auto; }
+.about-modal-version {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-primary);
+  background: var(--color-primary-subtle);
+  border-radius: var(--radius-pill);
+  padding: 0.2em 0.75em;
+}
 .footer .nav-link {
   color: var(--color-text-muted);
   font-weight: 500;
