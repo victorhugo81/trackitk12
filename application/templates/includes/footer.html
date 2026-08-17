@@ -3,12 +3,15 @@
 <footer class="footer py-3">
   <div class="container-fluid px-0">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-      <span class="copyright">TrackITk12 — device &amp; patron tracking for K-12 IT teams</span>
-      <span class="copyright">© <span id="copy-year"></span> AssistITk12</span>
+      <span class="copyright">TrackITk12 — device inventory for K-12 IT teams</span>
+      <button type="button" class="copyright copyright-link" data-bs-toggle="modal" data-bs-target="#aboutModal">© <span id="copy-year"></span> TrackITk12</button>
     </div>
   </div>
 </footer>
-<script nonce="{{ csp_nonce }}">document.getElementById('copy-year').textContent = new Date().getFullYear();</script>
+<script nonce="{{ csp_nonce }}">
+  document.getElementById('copy-year').textContent = new Date().getFullYear();
+  document.getElementById('about-copy-year').textContent = new Date().getFullYear();
+</script>
 
 <!-- End footer -->
 </div>

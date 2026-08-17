@@ -1,6 +1,6 @@
 <!--
 =========================================================
-* assistITk12 - v1.0  
+* TrackITK12 - v1.0  
 =========================================================
 
 * Product Page: 
@@ -76,6 +76,27 @@
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <button type="submit" class="btn btn-danger">Delete</button>
         </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- About modal -->
+<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog"
+     aria-labelledby="aboutModalLabel" aria-modal="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title" id="aboutModalLabel">About TrackITK12</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body pt-2 text-center">
+        <img src="{{ url_for('static', filename='img/favicon.png') }}" class="mb-3" style="max-height:6rem;" alt="TrackITK12">
+        <p class="mb-1">Device Inventory Management System for K-12 IT teams.</p>
+        <p class="mb-0 text-muted text-sm">Version {{ app_version or 'Unknown' }} &middot; &copy; <span id="about-copy-year"></span> TrackITK12</p>
+      </div>
+      <div class="modal-footer border-0 pt-2">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>

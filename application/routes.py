@@ -45,6 +45,24 @@ def inject_active_notifications():
     return dict(active_notifications=notifications)
 
 
+@cache.cached(timeout=3600, key_prefix='app_version')
+def get_app_version():
+    """Read the most recently released version number from CHANGELOG.md."""
+    changelog_path = os.path.join(current_app.root_path, 'CHANGELOG.md')
+    try:
+        with open(changelog_path, encoding='utf-8') as f:
+            changelog = f.read()
+        match = re.search(r'^##\s*\[(\d+\.\d+\.\d+)\]', changelog, re.MULTILINE)
+        return match.group(1) if match else None
+    except OSError:
+        return None
+
+
+@routes_blueprint.app_context_processor
+def inject_app_version():
+    return dict(app_version=get_app_version())
+
+
 # *****************************************************************
 #-------------------- Core Setup -------------------------
 # -------------- Do not change this section --------------
